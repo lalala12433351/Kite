@@ -1,0 +1,56 @@
+@import '../src/assets/css/site.css';
+@import '../src/assets/css/mobile.css';
+@import '../src/assets/css/fancybox.css';
+
+body {
+  font-family: "Alexandria", serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+  padding: 0;
+  margin: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+*:focus-visible {
+  outline: 2px solid #0a377f;
+  outline-offset: 2px;
+}
+
+a {
+  cursor: pointer !important;
+  color: #0a377f;
+  text-decoration: none;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(10, 55, 127, 0.45);
+  border-radius: 10px;
+}
+
+.show-fixed-buttons {
+  pointer-events: all;
+  bottom: 40px;
+}
+
+body.menu-opened .nav-menu {
+  display: block;
+}
+
+button.mobile-menu,
+button.close-tour {
+  background: none;
+  border: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}

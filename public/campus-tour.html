@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta name="authoring-tool" content="KiteAviation">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kite Institute of Aviation & Hospitality</title>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      overflow: hidden; /* prevent page scroll */
+      background: #000;
+    }
+
+    /* Full page container */
+    #tour {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      cursor: grab;
+    }
+    #tour:active { cursor: grabbing; }
+
+    /* The large image that will be panned */
+    #panImg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      user-select: none;
+      pointer-events: none; /* mouse goes to container */
+      will-change: transform;
+      transform: translate3d(0,0,0);
+      width: 150%;
+    }
+
+    /* Optional overlay label */
+    .hint {
+      position: absolute;
+      bottom: 16px;
+      left: 16px;
+      padding: 8px 12px;
+      font: 14px/1.2 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: #fff;
+      background: rgba(0,0,0,.15);
+      border-radius: 10px;
+      z-index: 99999;
+    }
+@media (max-width: 768px) {
+      
+    .hint {
+      position: fixed;
+      bottom: 50px;
+      padding: 5px 0px;
+      background: rgba(0,0,0,0);
+      border-radius: 10px;
+      font-size: 10px;
+  }
+}
+  </style>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+	new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+	j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+	'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+	})(window,document,'script','dataLayer','GTM-N3P689BK');
+</script>
+<!-- End Google Tag Manager -->
+<!-- write your code here -->
+</head>
+<body>
+	<!-- Google Tag Manager (noscript) -->
+	<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N3P689BK"
+	height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+	<!-- End Google Tag Manager (noscript) -->
+
+  <div id="tour">
+    <img id="panImg" src="images/kiteinstitute.jpg" alt="Campus Tour" />
+  </div>
+<div class="hint">Move your mouse (or finger) to look around</div>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script>
+    (function() {
+      var $tour = $('#tour');
+      var $img  = $('#panImg');
+
+      var vw = 0, vh = 0, iw = 0, ih = 0;
+      var maxX = 0, maxY = 0;
+
+      // Target and rendered positions (for easing)
+      var tx = 0, ty = 0, rx = 0, ry = 0;
+
+      var easing = 0.12; // 0..1 (higher = snappier)
+
+      function measure() {
+        vw = $tour.width();
+        vh = $tour.height();
+        iw = $img[0].naturalWidth || $img.width();
+        ih = $img[0].naturalHeight || $img.height();
+
+        // Scale image so it fully covers the viewport (like background-size: cover)
+        var scale = Math.max(vw / iw, vh / ih);
+        var sw = Math.ceil(iw * scale);
+        var sh = Math.ceil(ih * scale);
+        $img.css({ width: sw + 'px', height: sh + 'px' });
+
+        // Recompute pan bounds (how far we can move the image)
+        maxX = Math.max(0, sw - vw);
+        maxY = Math.max(0, sh - vh);
+
+        // Clamp current targets to new bounds
+        tx = clamp(tx, -maxX, 0);
+        ty = clamp(ty, -maxY, 0);
+      }
+
+      function clamp(v, min, max) { return Math.min(max, Math.max(min, v)); }
+
+      // Map pointer within the container to image translate
+      function setTargetFromPointer(pageX, pageY) {
+        var off = $tour.offset();
+        var x = pageX - off.left;
+        var y = pageY - off.top;
+
+        var nx = (vw <= 0) ? 0.5 : x / vw; // 0..1
+        var ny = (vh <= 0) ? 0.5 : y / vh;
+
+        // Translate so left/top corresponds to pointer at 0/0, right/bottom at 1/1
+        tx = -maxX * nx;
+        ty = -maxY * ny;
+      }
+
+      // Smooth render loop
+      function raf() {
+        rx += (tx - rx) * easing;
+        ry += (ty - ry) * easing;
+        $img.css('transform', 'translate3d(' + rx.toFixed(2) + 'px,' + ry.toFixed(2) + 'px,0)');
+        requestAnimationFrame(raf);
+      }
+
+      // Mouse move
+      $tour.on('mousemove', function(e) {
+        setTargetFromPointer(e.pageX, e.pageY);
+      });
+
+      // Touch support
+      $tour.on('touchstart touchmove', function(e) {
+        var t = e.originalEvent.touches[0];
+        if (t) setTargetFromPointer(t.pageX, t.pageY);
+      });
+
+      // Recalculate on resize and when image loads
+      $(window).on('resize', measure);
+      if ($img[0].complete) {
+        measure();
+      } else {
+        $img.on('load', measure);
+      }
+
+      requestAnimationFrame(raf);
+    })();
+  </script>
+</body>
+</html>

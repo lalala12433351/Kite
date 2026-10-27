@@ -1,0 +1,364 @@
+[
+  {
+    "id": 41,
+    "filename": "photo1-1.jpg",
+    "categories": [
+      "Management"
+    ],
+    "title": "photo1.jpg",
+    "uploadDate": "2026-05-19 09:38:20"
+  },
+  {
+    "id": 40,
+    "filename": "photo2-1.jpg",
+    "categories": [
+      "Management"
+    ],
+    "title": "photo2.jpg",
+    "uploadDate": "2026-05-19 09:38:20"
+  },
+  {
+    "id": 39,
+    "filename": "photo3-1.jpg",
+    "categories": [
+      "Management"
+    ],
+    "title": "photo3.jpg",
+    "uploadDate": "2026-05-19 09:38:20"
+  },
+  {
+    "id": 38,
+    "filename": "photo4-1.jpg",
+    "categories": [
+      "Management"
+    ],
+    "title": "photo4.jpg",
+    "uploadDate": "2026-05-19 09:38:20"
+  },
+  {
+    "id": 37,
+    "filename": "photo5.jpg",
+    "categories": [
+      "Management"
+    ],
+    "title": "photo5.jpg",
+    "uploadDate": "2026-05-19 09:38:20"
+  },
+  {
+    "id": 36,
+    "filename": "photo11.jpg",
+    "categories": [
+      "Sports Day 2025"
+    ],
+    "title": "photo11.jpg",
+    "uploadDate": "2026-05-19 09:08:16"
+  },
+  {
+    "id": 35,
+    "filename": "photo10.jpg",
+    "categories": [
+      "Sports Day 2025"
+    ],
+    "title": "photo10.jpg",
+    "uploadDate": "2026-05-19 09:08:16"
+  },
+  {
+    "id": 34,
+    "filename": "photo9.jpg",
+    "categories": [
+      "Sports Day 2025"
+    ],
+    "title": "photo9.jpg",
+    "uploadDate": "2026-05-19 09:08:16"
+  },
+  {
+    "id": 33,
+    "filename": "photo8.jpg",
+    "categories": [
+      "Sports Day 2025"
+    ],
+    "title": "photo8.jpg",
+    "uploadDate": "2026-05-19 09:08:16"
+  },
+  {
+    "id": 32,
+    "filename": "photo7.jpg",
+    "categories": [
+      "Sports Day 2025"
+    ],
+    "title": "photo7.jpg",
+    "uploadDate": "2026-05-19 09:08:16"
+  },
+  {
+    "id": 31,
+    "filename": "photo6.jpg",
+    "categories": [
+      "Sports Day 2025"
+    ],
+    "title": "photo6.jpg",
+    "uploadDate": "2026-05-19 09:08:16"
+  },
+  {
+    "id": 30,
+    "filename": "photo5.jpg",
+    "categories": [
+      "Sports Day 2025"
+    ],
+    "title": "photo5.jpg",
+    "uploadDate": "2026-05-19 09:08:16"
+  },
+  {
+    "id": 29,
+    "filename": "photo4.jpg",
+    "categories": [
+      "Sports Day 2025"
+    ],
+    "title": "photo4.jpg",
+    "uploadDate": "2026-05-19 09:08:16"
+  },
+  {
+    "id": 28,
+    "filename": "photo3.jpg",
+    "categories": [
+      "Sports Day 2025"
+    ],
+    "title": "photo3.jpg",
+    "uploadDate": "2026-05-19 09:08:16"
+  },
+  {
+    "id": 27,
+    "filename": "photo2.jpg",
+    "categories": [
+      "Sports Day 2025"
+    ],
+    "title": "photo2.jpg",
+    "uploadDate": "2026-05-19 09:08:16"
+  },
+  {
+    "id": 26,
+    "filename": "photo1.jpg",
+    "categories": [
+      "Sports Day 2025"
+    ],
+    "title": "photo1.jpg",
+    "uploadDate": "2026-05-19 09:08:16"
+  },
+  {
+    "id": "placeholder-1",
+    "filename": "img-66.jpg",
+    "categories": [
+      "Events",
+      "Campus",
+      "Students",
+      "Celebrations",
+      "Activities",
+      "Achievements",
+      "Workshops",
+      "Management",
+      "Others"
+    ],
+    "title": "Gallery placeholder – upload more via Admin",
+    "isOldImage": false,
+    "uploadDate": "2026-02-28"
+  },
+  {
+    "id": 1,
+    "filename": "photo1.jpg",
+    "categories": [],
+    "title": "photo1.jpg",
+    "isOldImage": true,
+    "uploadDate": "2026-05-19 08:05:42"
+  },
+  {
+    "id": 2,
+    "filename": "photo10.jpg",
+    "categories": [],
+    "title": "photo10.jpg",
+    "isOldImage": true,
+    "uploadDate": "2026-05-19 08:05:42"
+  },
+  {
+    "id": 3,
+    "filename": "photo11.jpg",
+    "categories": [],
+    "title": "photo11.jpg",
+    "isOldImage": true,
+    "uploadDate": "2026-05-19 08:05:42"
+  },
+  {
+    "id": 4,
+    "filename": "photo12.jpg",
+    "categories": [],
+    "title": "photo12.jpg",
+    "isOldImage": true,
+    "uploadDate": "2026-05-19 08:05:42"
+  },
+  {
+    "id": 5,
+    "filename": "photo13.jpg",
+    "categories": [],
+    "title": "photo13.jpg",
+    "isOldImage": true,
+    "uploadDate": "2026-05-19 08:05:42"
+  },
+  {
+    "id": 6,
+    "filename": "photo14.jpg",
+    "categories": [],
+    "title": "photo14.jpg",
+    "isOldImage": true,
+    "uploadDate": "2026-05-19 08:05:42"
+  },
+  {
+    "id": 7,
+    "filename": "photo15.jpg",
+    "categories": [],
+    "title": "photo15.jpg",
+    "isOldImage": true,
+    "uploadDate": "2026-05-19 08:05:42"
+  },
+  {
+    "id": 8,
+    "filename": "photo16.jpg",
+    "categories": [],
+    "title": "photo16.jpg",
+    "isOldImage": true,
+    "uploadDate": "2026-05-19 08:05:42"
+  },
+  {
+    "id": 9,
+    "filename": "photo17.jpg",
+    "categories": [],
+    "title": "photo17.jpg",
+    "isOldImage": true,
+    "uploadDate": "2026-05-19 08:05:42"
+  },
+  {
+    "id": 10,
+    "filename": "photo18.jpg",
+    "categories": [],
+    "title": "photo18.jpg",
+    "isOldImage": true,
+    "uploadDate": "2026-05-19 08:05:42"
+  },
+  {
+    "id": 11,
+    "filename": "photo19.jpg",
+    "categories": [],
+    "title": "photo19.jpg",
+    "isOldImage": true,
+    "uploadDate": "2026-05-19 08:05:42"
+  },
+  {
+    "id": 12,
+    "filename": "photo2.jpg",
+    "categories": [],
+    "title": "photo2.jpg",
+    "isOldImage": true,
+    "uploadDate": "2026-05-19 08:05:42"
+  },
+  {
+    "id": 13,
+    "filename": "photo20.jpg",
+    "categories": [],
+    "title": "photo20.jpg",
+    "isOldImage": true,
+    "uploadDate": "2026-05-19 08:05:42"
+  },
+  {
+    "id": 14,
+    "filename": "photo21.jpg",
+    "categories": [],
+    "title": "photo21.jpg",
+    "isOldImage": true,
+    "uploadDate": "2026-05-19 08:05:42"
+  },
+  {
+    "id": 15,
+    "filename": "photo22.jpg",
+    "categories": [],
+    "title": "photo22.jpg",
+    "isOldImage": true,
+    "uploadDate": "2026-05-19 08:05:42"
+  },
+  {
+    "id": 16,
+    "filename": "photo23.jpg",
+    "categories": [],
+    "title": "photo23.jpg",
+    "isOldImage": true,
+    "uploadDate": "2026-05-19 08:05:42"
+  },
+  {
+    "id": 17,
+    "filename": "photo3.jpg",
+    "categories": [],
+    "title": "photo3.jpg",
+    "isOldImage": true,
+    "uploadDate": "2026-05-19 08:05:42"
+  },
+  {
+    "id": 18,
+    "filename": "photo4.jpg",
+    "categories": [],
+    "title": "photo4.jpg",
+    "isOldImage": true,
+    "uploadDate": "2026-05-19 08:05:42"
+  },
+  {
+    "id": 19,
+    "filename": "photo5.jpg",
+    "categories": [],
+    "title": "photo5.jpg",
+    "isOldImage": true,
+    "uploadDate": "2026-05-19 08:05:42"
+  },
+  {
+    "id": 20,
+    "filename": "photo6.jpg",
+    "categories": [],
+    "title": "photo6.jpg",
+    "isOldImage": true,
+    "uploadDate": "2026-05-19 08:05:42"
+  },
+  {
+    "id": 21,
+    "filename": "photo7.jpg",
+    "categories": [],
+    "title": "photo7.jpg",
+    "isOldImage": true,
+    "uploadDate": "2026-05-19 08:05:42"
+  },
+  {
+    "id": 22,
+    "filename": "photo8.jpg",
+    "categories": [],
+    "title": "photo8.jpg",
+    "isOldImage": true,
+    "uploadDate": "2026-05-19 08:05:42"
+  },
+  {
+    "id": 23,
+    "filename": "photo9.jpg",
+    "categories": [],
+    "title": "photo9.jpg",
+    "isOldImage": true,
+    "uploadDate": "2026-05-19 08:05:42"
+  },
+  {
+    "id": 24,
+    "filename": "photo24.jpg",
+    "categories": [],
+    "title": "photo24.jpg",
+    "isOldImage": true,
+    "uploadDate": "2026-05-19 08:05:42"
+  },
+  {
+    "id": 25,
+    "filename": "photo25.jpg",
+    "categories": [],
+    "title": "photo25.jpg",
+    "isOldImage": true,
+    "uploadDate": "2026-05-19 08:05:42"
+  }
+]
