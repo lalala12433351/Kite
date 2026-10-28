@@ -14,6 +14,9 @@ function Header() {
     if (path === '/news') {
       return location.pathname === '/news' || location.pathname.startsWith('/news/') ? 'active' : '';
     }
+    if (path === '/blog') {
+      return location.pathname === '/blog' || location.pathname.startsWith('/blog/') ? 'active' : '';
+    }
     return location.pathname === path ? 'active' : '';
   };
 
@@ -76,6 +79,12 @@ function Header() {
           <Link to="/news" className={`item ${isActive('/news')}`} onClick={handleLinkClick}>
             <div className="text">
               <div className="front">News & Updates</div>
+            </div>
+          </Link>
+
+          <Link to="/blog" className={`item ${isActive('/blog')}`} onClick={handleLinkClick}>
+            <div className="text">
+              <div className="front">Blog</div>
             </div>
           </Link>
           

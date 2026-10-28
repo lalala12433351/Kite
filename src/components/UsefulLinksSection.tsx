@@ -17,12 +17,7 @@ function UsefulLinksSection() {
     <div className="text-box useful-links-section">
       <h3>Useful Links</h3>
       <div className="useful-links-grid">
-        <a
-          href="https://kiteaviation.in/students/verify"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="cmall-link-card"
-        >
+        <Link to="/students/verify" className="cmall-link-card">
           <span className="cmall-link-card__icon" aria-hidden>
             <img src={getAssetUrl('icons/certificate-check.svg')} alt="" loading="lazy" />
           </span>
@@ -30,7 +25,7 @@ function UsefulLinksSection() {
             <strong>Verify Certificate</strong>
             <small>Verify student certificates online</small>
           </span>
-        </a>
+        </Link>
 
         <button type="button" onClick={openCampusTour} className="cmall-link-card">
           <span className="cmall-link-card__icon" aria-hidden>

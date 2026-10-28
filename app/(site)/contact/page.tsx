@@ -1,7 +1,11 @@
 import PageComponent from '@/src/views/Contact';
-import { pageMeta } from '@/lib/pageMeta';
+import { toNextMetadata } from '@/lib/pageMetaStore';
 
-export const metadata = pageMeta.contact;
+export const dynamic = 'force-dynamic';
+
+export async function generateMetadata() {
+  return toNextMetadata('contact');
+}
 
 export default function ContactPage() {
   return <PageComponent />;

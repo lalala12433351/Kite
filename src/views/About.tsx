@@ -77,8 +77,7 @@ function About() {
               <a
                 key={index}
                 href={airline.url}
-                target="_blank"
-                rel="noopener noreferrer"
+                                rel="noopener noreferrer"
                 className={`card tooltip-btn ${airline.name} ${airline.className || ''}`}
               >
                 <span className="tooltip-txt">{airline.url}</span>
@@ -123,14 +122,9 @@ function About() {
               <div className="iata-certified-text">
                 <h4>Verify Student Certificate</h4>
                 <p>Verify Kite Institute student course certificates instantly through our secure online portal.</p>
-                <a
-                  href="https://kiteaviation.in/students/verify"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="verify-certificate-link"
-                >
+                <Link to="/students/verify" className="verify-certificate-link">
                   Verify Certificate
-                </a>
+                </Link>
               </div>
             </div>
           </div>

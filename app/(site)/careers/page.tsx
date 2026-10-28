@@ -1,7 +1,11 @@
 import PageComponent from '@/src/views/Careers';
-import { pageMeta } from '@/lib/pageMeta';
+import { toNextMetadata } from '@/lib/pageMetaStore';
 
-export const metadata = pageMeta.careers;
+export const dynamic = 'force-dynamic';
+
+export async function generateMetadata() {
+  return toNextMetadata('careers');
+}
 
 export default function CareersPage() {
   return <PageComponent />;

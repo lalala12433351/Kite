@@ -1,0 +1,57 @@
+[
+  {
+    "id": "blog-kite-1",
+    "slug": "5-tips-to-start-your-aviation-career",
+    "title": "5 Practical Tips to Start Your Aviation Career",
+    "metaTitle": "5 Tips to Start Your Aviation Career | Kite Institute",
+    "metaDescription": "Planning a career in aviation or hospitality? These five practical tips from Kite Institute help you prepare for airline and airport roles in Bangalore.",
+    "coverImage": "/images/himg-1.jpg",
+    "blocks": [
+      {
+        "id": "b1",
+        "type": "paragraph",
+        "content": "Breaking into aviation takes clarity, grooming, and the right training pathway. Here are five practical tips from Kite Institute mentors.",
+        "align": "left"
+      },
+      {
+        "id": "b2",
+        "type": "h2",
+        "content": "1. Choose an industry-aligned course",
+        "align": "left"
+      },
+      {
+        "id": "b3",
+        "type": "paragraph",
+        "content": "Pick programmes that map to real airport, airline, and hospitality hiring needs — not generic soft-skill packages alone.",
+        "align": "left"
+      },
+      {
+        "id": "b4",
+        "type": "h2",
+        "content": "2. Build interview confidence early",
+        "align": "left"
+      },
+      {
+        "id": "b5",
+        "type": "paragraph",
+        "content": "Practice mock interviews, group discussions, and professional grooming so you walk into selection rounds prepared.",
+        "align": "left"
+      }
+    ],
+    "createdAt": "2026-07-22",
+    "isPublished": true,
+    "excerpt": "Five mentor-backed tips to prepare for airline, airport, and hospitality careers.",
+    "status": "published",
+    "authorName": "Kite Institute",
+    "authorBio": "India’s trusted aviation & hospitality training institute in Bangalore.",
+    "category": "Career Guidance",
+    "categories": ["Career Guidance"],
+    "tags": ["aviation career", "cabin crew", "airport jobs"],
+    "isPinned": true,
+    "focusKeyword": "aviation career",
+    "views": 128,
+    "likes": 14,
+    "shares": 6,
+    "comments": []
+  }
+]

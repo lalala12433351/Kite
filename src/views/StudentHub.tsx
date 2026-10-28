@@ -32,6 +32,11 @@ function StudentHub() {
                 <span className="desc">Explore our library of recorded sessions at your own pace. Catch up on missed classes or discover new learning materials whenever you're ready.</span>
                 <span className="desc link">Explore Now</span>
             </Link>
+            <Link className="item certificate-verify" to="/students/verify">
+              <span className="name">Certificate<br/>Verification</span>
+              <span className="desc">Verify the authenticity of certificates issued by Kite Institute using the certificate number and student name.</span>
+              <span className="desc link">Verify Certificate</span>
+            </Link>
             <a className="item quiz showloader" href="https://kiteaviation.in/quiz" target="_blank" rel="noopener noreferrer">
               <span className="name">Aviation & Hospitality Knowledge Quiz</span>
               <span className="desc">Test your knowledge on Aviation & Hospitality with our interactive quiz, get your score and a detailed report delivered straight to your email.</span>

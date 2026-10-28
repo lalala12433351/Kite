@@ -1,7 +1,11 @@
 import PageComponent from '@/src/views/AdminDashboard';
-import { pageMeta } from '@/lib/pageMeta';
+import { toNextMetadata } from '@/lib/pageMetaStore';
 
-export const metadata = pageMeta.admin;
+export const dynamic = 'force-dynamic';
+
+export async function generateMetadata() {
+  return toNextMetadata('admin');
+}
 
 export default function AdminDashboardPage() {
   return <PageComponent />;

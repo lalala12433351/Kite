@@ -189,7 +189,7 @@ export const chatAnswers = {
   'amadeus training gds course':
     'Our Foundation in Travel & Tourism includes hands-on Amadeus GDS training for reservations and ticketing. Ask for batch timings.',
   'certificate verification verify certificate online':
-    'Students can verify course certificates through Kite’s secure online portal — see our website or ask admissions for the verification link.',
+    'You can verify a Kite certificate on this site at /students/verify — enter the certificate number and the student’s first or last name.',
   'swimming pool training cabin crew':
     'Swimming is important for cabin crew — our diploma includes swimming as part of preparation for airline requirements.',
   'biggest center infrastructure facility':

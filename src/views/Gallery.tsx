@@ -289,14 +289,9 @@ function Gallery() {
               <div className="iata-certified-text">
                 <h4>Verify Student Certificate</h4>
                 <p>Verify Kite Institute student course certificates instantly through our secure online portal.</p>
-                <a
-                  href="https://kiteaviation.in/students/verify"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="verify-certificate-link"
-                >
+                <Link to="/students/verify" className="verify-certificate-link">
                   Verify Certificate
-                </a>
+                </Link>
               </div>
             </div>
           </div>

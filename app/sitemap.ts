@@ -12,7 +12,9 @@ const PATHS = [
   '/team',
   '/gallery',
   '/news',
+  '/blog',
   '/student-hub',
+  '/students/verify',
   '/flight-announcements',
   '/virtual-classroom-login',
   '/careers',
@@ -46,6 +48,21 @@ export default function sitemap() {
     }
   } catch {
     /* news file is connected at the end of the migration */
+  }
+
+  try {
+    const file = path.join(process.cwd(), 'data', 'blogs.json');
+    const posts = JSON.parse(fs.readFileSync(file, 'utf8'));
+    for (const post of posts) {
+      if (!post?.slug) continue;
+      if (post.status && post.status !== 'published' && !post.isPublished) continue;
+      entries.push({
+        url: `${BASE}/blog/${post.slug}`,
+        lastModified: post.createdAt ? new Date(post.createdAt) : now,
+      });
+    }
+  } catch {
+    /* blogs optional until first save */
   }
 
   return entries;

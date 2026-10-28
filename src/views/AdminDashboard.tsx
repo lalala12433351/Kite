@@ -7,6 +7,7 @@ import CareersAdmin from './CareersAdmin';
 import AviationCareersAdmin from './AviationCareersAdmin';
 import NewsAdmin from './NewsAdmin';
 import GalleryAdminHub from './GalleryAdminHub';
+import CertificatesAdmin from './CertificatesAdmin';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
@@ -18,6 +19,7 @@ const modules = [
   { id: 'aviation', label: 'Aviation Careers', component: AviationCareersAdmin },
   { id: 'news', label: 'News', component: NewsAdmin },
   { id: 'gallery', label: 'Gallery', component: GalleryAdminHub },
+  { id: 'certificates', label: 'Certificates', component: CertificatesAdmin },
 ];
 
 function AdminDashboard() {
@@ -145,7 +147,7 @@ function AdminDashboard() {
             <header className="unified-admin-header">
               <div>
                 <h1>Kite Unified Admin</h1>
-                <p>Manage careers, aviation careers, news, and gallery from a single dashboard.</p>
+                <p>Manage careers, aviation careers, news, gallery, and certificates from a single dashboard.</p>
               </div>
               <button onClick={handleLogout} className="admin-btn--logout-small">
                 Logout

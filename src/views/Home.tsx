@@ -8,14 +8,12 @@ import VideoGallery from '../components/VideoGallery';
 import UsefulLinksSection from '../components/UsefulLinksSection';
 import StudentSuccessStoriesSection from '../components/StudentSuccessStoriesSection';
 import HomeFaqCtaSection from '../components/HomeFaqCtaSection';
+import HomeHeroBanner from '../components/HomeHeroBanner';
 
 // Get base URL for assets
 const getAssetUrl = (path) => `${'/'}${path}`;
 
 function Home() {
-  const [typing1Text, setTyping1Text] = useState('');
-  const [typing2Text, setTyping2Text] = useState('');
-  const [circlesVisible, setCirclesVisible] = useState(false);
   const [visibleCircles, setVisibleCircles] = useState([]);
   const [showGoogleReviews, setShowGoogleReviews] = useState(false);
   const [activeWhyChooseCard, setActiveWhyChooseCard] = useState(null);
@@ -109,47 +107,16 @@ function Home() {
   ];
 
   useEffect(() => {
-    // Typing effect for first line - faster and smoother
-    const text1 = "India's Most Trusted";
-    let i = 0;
-    const typeInterval1 = setInterval(() => {
-      if (i <= text1.length) {
-        setTyping1Text(text1.substring(0, i));
-        i++;
-      } else {
-        clearInterval(typeInterval1);
-        // Start second typing effect
-        const text2 = "Aviation Training Institute";
-        let j = 0;
-        const typeInterval2 = setInterval(() => {
-          if (j <= text2.length) {
-            setTyping2Text(text2.substring(0, j));
-            j++;
-          } else {
-            clearInterval(typeInterval2);
-            // Show circles immediately without delay
-            setCirclesVisible(true);
-            // Staggered appearance of circles
-            const circleIndices = [0, 1, 2, 3, 4];
-            circleIndices.forEach((index, i) => {
-              setTimeout(() => {
-                setVisibleCircles(prev => [...prev, index]);
-                // Show google reviews after last circle
-                if (index === 4) {
-                  setTimeout(() => {
-                    setShowGoogleReviews(true);
-                  }, 200); // 200ms delay after last circle
-                }
-              }, i * 150); // 150ms delay between each circle
-            });
-          }
-        }, 35); // Faster: 30ms per character (was 45ms)
-      }
-    }, 35); // Faster: 20ms per character (was 35ms)
-
-    return () => {
-      clearInterval(typeInterval1);
-    };
+    const circleIndices = [0, 1, 2, 3, 4];
+    const timers = circleIndices.map((index, i) =>
+      window.setTimeout(() => {
+        setVisibleCircles((prev) => [...prev, index]);
+        if (index === 4) {
+          window.setTimeout(() => setShowGoogleReviews(true), 200);
+        }
+      }, i * 150),
+    );
+    return () => timers.forEach((id) => window.clearTimeout(id));
   }, []);
 
   useEffect(() => {
@@ -171,13 +138,9 @@ function Home() {
   return (
     <>
       <div className="content-panel home-page" id="home">
-        <div className="homepage-head-banner">
-          <h1>
-            <div className="typing-container" id="typing1" dangerouslySetInnerHTML={{ __html: typing1Text }}></div>
-            <br />
-            <div className="typing-container" id="typing2">{typing2Text}</div>
-          </h1>
+        <HomeHeroBanner />
 
+        <div className="homepage-head-banner homepage-head-banner--circles">
           <div className="circle-container">
             <Link to="/about" className={`circle tooltip-btn ${visibleCircles.includes(0) ? 'zoom-in' : ''}`}>
               <span className="for-hover">
@@ -310,8 +273,7 @@ function Home() {
                 <a
                   key={index}
                   href={airline.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                                    rel="noopener noreferrer"
                   className={`card tooltip-btn ${airline.name} ${airline.className || ''}`}
                 >
                   <span className="tooltip-txt">{airline.url}</span>
@@ -356,14 +318,9 @@ function Home() {
                 <div className="iata-certified-text">
                   <h4>Verify Student Certificate</h4>
                   <p>Verify Kite Institute student course certificates instantly through our secure online portal.</p>
-                  <a
-                    href="https://kiteaviation.in/students/verify"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="verify-certificate-link"
-                  >
+                  <Link to="/students/verify" className="verify-certificate-link">
                     Verify Certificate
-                  </a>
+                  </Link>
                 </div>
               </div>
             </div>

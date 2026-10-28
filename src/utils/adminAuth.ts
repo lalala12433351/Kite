@@ -8,10 +8,13 @@ export async function submitAdminLogin(username, password) {
       credentials: 'same-origin',
       body: JSON.stringify({ username: String(username || '').trim(), password }),
     });
-    if (!response.ok) return null;
-    return response.json();
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      return { ok: false, message: data.message || 'Invalid username or password' };
+    }
+    return data;
   } catch {
-    return null;
+    return { ok: false, message: 'Login request failed' };
   }
 }
 

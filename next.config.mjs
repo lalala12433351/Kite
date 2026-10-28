@@ -17,6 +17,7 @@ const nextConfig = {
       { source: '/aviation-careers-admin', destination: '/admin', permanent: false },
       { source: '/news-admin', destination: '/admin', permanent: false },
       { source: '/gallery-admin', destination: '/admin?module=gallery', permanent: false },
+      { source: '/certificate/admin', destination: '/superadmin?tab=certificates', permanent: false },
     ];
   },
   async rewrites() {
