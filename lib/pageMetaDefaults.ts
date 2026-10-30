@@ -44,7 +44,7 @@ export const PAGE_META_ADMIN_ROWS: {
   { key: 'team', label: 'Our Team', path: '/team' },
   { key: 'gallery', label: 'Media Gallery', path: '/gallery' },
   { key: 'news', label: 'News & Updates', path: '/news' },
-  { key: 'newsDetail', label: 'News detail (template)', path: '/news/[id]' },
+  { key: 'newsDetail', label: 'News detail (template)', path: '/news/[slug]' },
   { key: 'blog', label: 'Blog', path: '/blog' },
   { key: 'blogDetail', label: 'Blog detail (template)', path: '/blog/[slug]' },
   { key: 'studentHub', label: 'Student Hub', path: '/student-hub' },

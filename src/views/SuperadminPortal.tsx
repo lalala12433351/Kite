@@ -1,6 +1,6 @@
 'use client';
 
-import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from 'react';
+import { ChangeEvent, FormEvent, ReactNode, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from '@/lib/router';
 import { fetchAdminSession, submitAdminLogin, submitAdminLogout } from '@/src/utils/adminAuth';
 import { CERTIFICATE_BATCHES } from '@/lib/certificateBatches';
@@ -8,11 +8,11 @@ import CareersAdmin from './CareersAdmin';
 import AviationCareersAdmin from './AviationCareersAdmin';
 import NewsAdmin from './NewsAdmin';
 import GalleryAdminHub from './GalleryAdminHub';
-import HeroSlidesAdmin from './HeroSlidesAdmin';
+import HiringPartnersAdmin from './HiringPartnersAdmin';
 import BlogsAdmin from './BlogsAdmin';
 import PageMetaAdmin from './PageMetaAdmin';
 
-type Tab = 'home' | 'hero' | 'blogs' | 'seo' | 'certificates' | 'careers' | 'aviation' | 'news' | 'gallery';
+type Tab = 'home' | 'partners' | 'blogs' | 'seo' | 'certificates' | 'careers' | 'aviation' | 'news' | 'gallery';
 
 type Certificate = {
   id: number;
@@ -32,7 +32,129 @@ const emptyForm = {
   status: 'valid',
 };
 
-const VALID_TABS: Tab[] = ['home', 'hero', 'blogs', 'seo', 'certificates', 'careers', 'aviation', 'news', 'gallery'];
+const VALID_TABS: Tab[] = ['home', 'partners', 'blogs', 'seo', 'certificates', 'careers', 'aviation', 'news', 'gallery'];
+
+function PortalIcon({ children }: { children: ReactNode }) {
+  return (
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      {children}
+    </svg>
+  );
+}
+
+const TILES: {
+  id: Exclude<Tab, 'home'>;
+  title: string;
+  description: string;
+  tone: 'blue' | 'amber' | 'green' | 'violet';
+  icon: ReactNode;
+}[] = [
+  {
+    id: 'partners',
+    title: 'Hiring Partners',
+    description: 'Manage airline and hospitality logos on Home, About, and Placement.',
+    tone: 'green',
+    icon: (
+      <PortalIcon>
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+      </PortalIcon>
+    ),
+  },
+  {
+    id: 'blogs',
+    title: 'Blog',
+    description: 'WordPress-style posts, block editor, RankMath SEO, and comments.',
+    tone: 'violet',
+    icon: (
+      <PortalIcon>
+        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+        <polyline points="14 2 14 8 20 8" />
+        <line x1="16" y1="13" x2="8" y2="13" />
+        <line x1="16" y1="17" x2="8" y2="17" />
+        <line x1="10" y1="9" x2="8" y2="9" />
+      </PortalIcon>
+    ),
+  },
+  {
+    id: 'seo',
+    title: 'SEO Meta Tags',
+    description: 'Edit page titles and meta descriptions for Google and browser tabs.',
+    tone: 'green',
+    icon: (
+      <PortalIcon>
+        <circle cx="11" cy="11" r="8" />
+        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+      </PortalIcon>
+    ),
+  },
+  {
+    id: 'certificates',
+    title: 'Certificates',
+    description: 'Add, edit, revoke, and Excel bulk upload student certificates.',
+    tone: 'blue',
+    icon: (
+      <PortalIcon>
+        <circle cx="12" cy="8" r="6" />
+        <path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11" />
+      </PortalIcon>
+    ),
+  },
+  {
+    id: 'careers',
+    title: 'Careers',
+    description: 'Manage institute job posts.',
+    tone: 'amber',
+    icon: (
+      <PortalIcon>
+        <rect x="2" y="7" width="20" height="14" rx="2" />
+        <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
+        <line x1="12" y1="12" x2="12" y2="12.01" />
+        <path d="M2 13a10 4.5 0 0 0 20 0" />
+      </PortalIcon>
+    ),
+  },
+  {
+    id: 'aviation',
+    title: 'Aviation Careers',
+    description: 'Manage aviation job listings.',
+    tone: 'green',
+    icon: (
+      <PortalIcon>
+        <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z" />
+      </PortalIcon>
+    ),
+  },
+  {
+    id: 'news',
+    title: 'News',
+    description: 'Publish and edit news updates.',
+    tone: 'violet',
+    icon: (
+      <PortalIcon>
+        <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2" />
+        <path d="M18 14h-8" />
+        <path d="M15 18h-5" />
+        <path d="M10 6h8v4h-8V6Z" />
+      </PortalIcon>
+    ),
+  },
+  {
+    id: 'gallery',
+    title: 'Gallery',
+    description: 'Upload and organise media albums.',
+    tone: 'blue',
+    icon: (
+      <PortalIcon>
+        <rect x="3" y="3" width="18" height="18" rx="2" />
+        <circle cx="9" cy="9" r="2" />
+        <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+      </PortalIcon>
+    ),
+  },
+];
 
 function SuperadminPortal() {
   const navigate = useNavigate();
@@ -69,15 +191,19 @@ function SuperadminPortal() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const tab = params.get('tab') as Tab | null;
-    if (tab && VALID_TABS.includes(tab)) setActiveTab(tab);
+    const rawTab = params.get('tab');
+    if (rawTab === 'hero') {
+      navigate('/superadmin', { replace: true });
+    } else if (rawTab && VALID_TABS.includes(rawTab as Tab)) {
+      setActiveTab(rawTab as Tab);
+    }
 
     fetchAdminSession()
       .then((session) => {
         if (session?.loggedIn) setIsAuthenticated(true);
       })
       .finally(() => setCheckingSession(false));
-  }, []);
+  }, [navigate]);
 
   const loadCertificates = async () => {
     setLoadingCerts(true);
@@ -278,13 +404,13 @@ function SuperadminPortal() {
         <div className="superadmin-login__card">
           <div className="superadmin-login__brand">
             <div className="superadmin-login__icon" aria-hidden>
-              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="1.85" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="3" y="11" width="18" height="11" rx="2" />
                 <path d="M7 11V7a5 5 0 0 1 10 0v4" />
               </svg>
             </div>
-            <h1>Superadmin Portal</h1>
-            <p>Log in to manage certificates and site content.</p>
+            <h1>Kite Superadmin</h1>
+            <p>Sign in with your admin credentials to manage site content.</p>
           </div>
 
           {loginError && <div className="superadmin-login__error">{loginError}</div>}
@@ -297,8 +423,9 @@ function SuperadminPortal() {
                 required
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="Enter username"
+                placeholder="Admin username"
                 autoComplete="username"
+                autoFocus
               />
             </label>
             <label>
@@ -308,17 +435,17 @@ function SuperadminPortal() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter password"
+                placeholder="Admin password"
                 autoComplete="current-password"
               />
             </label>
             <button type="submit" disabled={isLoggingIn}>
-              {isLoggingIn ? 'Authenticating…' : 'Secure Log In'}
+              {isLoggingIn ? 'Signing in…' : 'Sign in'}
             </button>
           </form>
 
           <div className="superadmin-login__footer">
-            <Link to="/">Return to Website</Link>
+            <Link to="/">Return to website</Link>
           </div>
         </div>
       </div>
@@ -336,7 +463,12 @@ function SuperadminPortal() {
       <header className="superadmin-topbar">
         <div className="superadmin-topbar__inner">
           <div className="superadmin-topbar__brand">
-            <div className="superadmin-topbar__mark" aria-hidden />
+            <div className="superadmin-topbar__mark" aria-hidden>
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.85" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 2 4.5 20.29l.71.71L12 18l6.79 3 .71-.71z" />
+                <path d="M12 18V8" />
+              </svg>
+            </div>
             <div>
               <h1>Kite Control Panel</h1>
               <p>Superadmin content manager</p>
@@ -361,25 +493,14 @@ function SuperadminPortal() {
 
       {activeTab !== 'home' && (
         <nav className="superadmin-subnav">
-          {(
-            [
-              ['hero', 'Hero Banner'],
-              ['blogs', 'Blog'],
-              ['seo', 'SEO Meta'],
-              ['certificates', 'Certificates'],
-              ['careers', 'Careers'],
-              ['aviation', 'Aviation'],
-              ['news', 'News'],
-              ['gallery', 'Gallery'],
-            ] as const
-          ).map(([id, label]) => (
+          {TILES.map((tile) => (
             <button
-              key={id}
+              key={tile.id}
               type="button"
-              className={`superadmin-subnav__btn ${activeTab === id ? 'is-active' : ''}`}
-              onClick={() => goTab(id)}
+              className={`superadmin-subnav__btn ${activeTab === tile.id ? 'is-active' : ''}`}
+              onClick={() => goTab(tile.id)}
             >
-              {label}
+              {tile.id === 'seo' ? 'SEO Meta' : tile.id === 'aviation' ? 'Aviation' : tile.title}
             </button>
           ))}
         </nav>
@@ -394,56 +515,25 @@ function SuperadminPortal() {
             </div>
 
             <div className="superadmin-tile-grid">
-              <button type="button" className="superadmin-tile" onClick={() => goTab('hero')}>
-                <span className="superadmin-tile__icon superadmin-tile__icon--amber" aria-hidden />
-                <strong>Hero Banner</strong>
-                <small>Manage homepage hero carousel slides, copy, buttons, and images.</small>
-              </button>
-              <button type="button" className="superadmin-tile" onClick={() => goTab('blogs')}>
-                <span className="superadmin-tile__icon superadmin-tile__icon--violet" aria-hidden />
-                <strong>Blog</strong>
-                <small>WordPress-style posts, block editor, RankMath SEO, and comments.</small>
-              </button>
-              <button type="button" className="superadmin-tile" onClick={() => goTab('seo')}>
-                <span className="superadmin-tile__icon superadmin-tile__icon--green" aria-hidden />
-                <strong>SEO Meta Tags</strong>
-                <small>Edit page titles and meta descriptions for Google and browser tabs.</small>
-              </button>
-              <button type="button" className="superadmin-tile" onClick={() => goTab('certificates')}>
-                <span className="superadmin-tile__icon superadmin-tile__icon--blue" aria-hidden />
-                <strong>Certificates</strong>
-                <small>Add, edit, revoke, and Excel bulk upload student certificates.</small>
-              </button>
-              <button type="button" className="superadmin-tile" onClick={() => goTab('careers')}>
-                <span className="superadmin-tile__icon superadmin-tile__icon--amber" aria-hidden />
-                <strong>Careers</strong>
-                <small>Manage institute job posts.</small>
-              </button>
-              <button type="button" className="superadmin-tile" onClick={() => goTab('aviation')}>
-                <span className="superadmin-tile__icon superadmin-tile__icon--green" aria-hidden />
-                <strong>Aviation Careers</strong>
-                <small>Manage aviation job listings.</small>
-              </button>
-              <button type="button" className="superadmin-tile" onClick={() => goTab('news')}>
-                <span className="superadmin-tile__icon superadmin-tile__icon--violet" aria-hidden />
-                <strong>News</strong>
-                <small>Publish and edit news updates.</small>
-              </button>
-              <button type="button" className="superadmin-tile" onClick={() => goTab('gallery')}>
-                <span className="superadmin-tile__icon superadmin-tile__icon--blue" aria-hidden />
-                <strong>Gallery</strong>
-                <small>Upload and organise media albums.</small>
-              </button>
+              {TILES.map((tile) => (
+                <button key={tile.id} type="button" className="superadmin-tile" onClick={() => goTab(tile.id)}>
+                  <span className={`superadmin-tile__icon superadmin-tile__icon--${tile.tone}`} aria-hidden>
+                    {tile.icon}
+                  </span>
+                  <strong>{tile.title}</strong>
+                  <small>{tile.description}</small>
+                </button>
+              ))}
             </div>
           </section>
         )}
 
-        {activeTab === 'hero' && (
+        {activeTab === 'partners' && (
           <section className="superadmin-section">
             <button type="button" className="superadmin-back" onClick={() => goTab('home')}>
               ← Dashboard
             </button>
-            <HeroSlidesAdmin onToast={showToast} />
+            <HiringPartnersAdmin onToast={showToast} />
           </section>
         )}
 
@@ -649,7 +739,7 @@ function SuperadminPortal() {
             <button type="button" className="superadmin-back" onClick={() => goTab('home')}>
               ← Dashboard
             </button>
-            <NewsAdmin embedded onLogout={handleLogout} />
+            <NewsAdmin embedded onLogout={handleLogout} onToast={showToast} />
           </section>
         )}
 

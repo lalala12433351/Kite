@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { dataDir } from '@/lib/content';
+import { assertNotEmptyOverwrite, atomicWriteJson } from '@/lib/safeJsonStore';
 
 export type HeroSlide = {
   id: string;
@@ -61,7 +62,10 @@ export function readHeroSlides(): HeroSlide[] {
 
 export function writeHeroSlides(slides: HeroSlide[]) {
   ensureFile();
-  const cleaned = (Array.isArray(slides) ? slides : []).map((item, index) => ({
+  const incoming = Array.isArray(slides) ? slides : [];
+  assertNotEmptyOverwrite(FILE, incoming.length, 'hero slides');
+
+  const cleaned = incoming.map((item, index) => ({
     id: String(item.id || `hero-${index + 1}`).trim() || `hero-${index + 1}`,
     badge: String(item.badge || '').trim(),
     title: String(item.title || '').trim(),
@@ -72,6 +76,6 @@ export function writeHeroSlides(slides: HeroSlide[]) {
     btn2Text: String(item.btn2Text || '').trim(),
     btn2Url: String(item.btn2Url || '').trim(),
   }));
-  fs.writeFileSync(FILE, `${JSON.stringify(cleaned, null, 2)}\n`, 'utf8');
+  atomicWriteJson(FILE, cleaned);
   return cleaned;
 }

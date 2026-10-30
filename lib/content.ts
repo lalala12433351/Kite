@@ -39,7 +39,11 @@ export function readContent(kind) {
   if (!fs.existsSync(file)) return emptyValue(kind);
   const data = JSON.parse(fs.readFileSync(file, 'utf8'));
   if (kind === 'news' && Array.isArray(data)) {
-    return data.map((post) => ({ ...post, content: sanitizeHtml(post.content) }));
+    // Prefer blog-style posts (blocks). Legacy HTML `content` is still sanitized.
+    return data.map((post) => {
+      if (Array.isArray(post?.blocks)) return post;
+      return { ...post, content: sanitizeHtml(post.content) };
+    });
   }
   if ((kind === 'careers' || kind === 'aviation-careers') && Array.isArray(data)) {
     return data.map((post) => ({ ...post, content: sanitizeHtml(post.content) }));

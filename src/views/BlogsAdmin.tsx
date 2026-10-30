@@ -3,21 +3,47 @@
 import { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import {
   BLOG_CATEGORIES,
+  NEWS_CATEGORIES,
   blocksToClassic,
-  calcListSeoScore,
-  calcSeoScore,
   classicToBlocks,
-  createEmptyBlock,
   createEmptyPost,
   slugify,
   wordStats,
   type BlogBlock,
-  type BlogBlockType,
   type BlogPost,
   type BlogStatus,
 } from '@/lib/blogShared';
+import { calcRankMathScore } from '@/lib/blogSeo';
+import BlogBlockEditor from '@/src/components/BlogBlockEditor';
+import BlogSeoPanel from '@/src/components/BlogSeoPanel';
 
 type SubTab = 'posts' | 'comments' | 'stats';
+export type ContentKind = 'blog' | 'news';
+
+const KIND_CONFIG = {
+  blog: {
+    label: 'Blog',
+    api: '/api/blogs',
+    upload: '/api/blogs/upload',
+    pathPrefix: '/blog' as const,
+    categories: BLOG_CATEGORIES,
+    emptyMessage: 'Loading blog posts…',
+    feedTitle: 'Articles Feed',
+    feedHelp: 'Manage blog posts, configure URLs, and write SEO content to rank on search engines.',
+    pinLabel: 'Pin to top of blog feed',
+  },
+  news: {
+    label: 'News',
+    api: '/api/news',
+    upload: '/api/news/upload',
+    pathPrefix: '/news' as const,
+    categories: NEWS_CATEGORIES,
+    emptyMessage: 'Loading news posts…',
+    feedTitle: 'News Feed',
+    feedHelp: 'Manage news stories, configure URLs, and write SEO content to rank on search engines.',
+    pinLabel: 'Pin to top of news feed',
+  },
+};
 
 function seoBarClass(score: number) {
   if (score >= 80) return 'is-good';
@@ -27,9 +53,12 @@ function seoBarClass(score: number) {
 
 function BlogsAdmin({
   onToast,
+  kind = 'blog',
 }: {
   onToast?: (type: 'success' | 'error', text: string) => void;
+  kind?: ContentKind;
 }) {
+  const cfg = KIND_CONFIG[kind];
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -39,7 +68,6 @@ function BlogsAdmin({
   const [classicText, setClassicText] = useState('');
   const [sidebarTab, setSidebarTab] = useState<'page' | 'block'>('page');
   const [activeBlockId, setActiveBlockId] = useState<string | null>(null);
-  const [showInserter, setShowInserter] = useState(false);
   const [uploading, setUploading] = useState(false);
 
   const notify = (type: 'success' | 'error', text: string) => onToast?.(type, text);
@@ -74,16 +102,16 @@ function BlogsAdmin({
   const load = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/blogs', { credentials: 'same-origin' });
+      const res = await fetch(cfg.api, { credentials: 'same-origin' });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data.success) {
-        notify('error', data.error || 'Failed to load blogs');
+        notify('error', data.error || `Failed to load ${cfg.label.toLowerCase()}`);
         setPosts([]);
         return;
       }
       setPosts(Array.isArray(data.posts) ? data.posts : []);
     } catch {
-      notify('error', 'Failed to load blogs');
+      notify('error', `Failed to load ${cfg.label.toLowerCase()}`);
     } finally {
       setLoading(false);
     }
@@ -92,12 +120,16 @@ function BlogsAdmin({
   useEffect(() => {
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [kind]);
 
-  const persist = async (next: BlogPost[], message = 'Blog posts saved') => {
+  const persist = async (next: BlogPost[], message = `${cfg.label} posts saved`) => {
+    if (!Array.isArray(next) || next.length === 0) {
+      notify('error', 'Save blocked — post list is empty. Reload before saving to avoid data loss.');
+      return false;
+    }
     setSaving(true);
     try {
-      const res = await fetch('/api/blogs', {
+      const res = await fetch(cfg.api, {
         method: 'POST',
         credentials: 'same-origin',
         headers: { 'Content-Type': 'application/json' },
@@ -136,7 +168,7 @@ function BlogsAdmin({
   };
 
   const addPost = () => {
-    const post = createEmptyPost();
+    const post = createEmptyPost(kind);
     setPosts((prev) => [post, ...prev]);
     setEditingId(post.id);
     setClassicMode(false);
@@ -156,39 +188,6 @@ function BlogsAdmin({
     if (editingId === id) setEditingId(null);
   };
 
-  const insertBlock = (type: BlogBlockType, afterId?: string | null) => {
-    if (!editing) return;
-    const block = createEmptyBlock(type);
-    const blocks = [...editing.blocks];
-    const idx = afterId ? blocks.findIndex((b) => b.id === afterId) : -1;
-    if (idx >= 0) blocks.splice(idx + 1, 0, block);
-    else blocks.push(block);
-    updateEditing({ blocks });
-    setActiveBlockId(block.id);
-    setShowInserter(false);
-  };
-
-  const moveBlock = (blockId: string, dir: -1 | 1) => {
-    if (!editing) return;
-    const blocks = [...editing.blocks];
-    const idx = blocks.findIndex((b) => b.id === blockId);
-    const next = idx + dir;
-    if (idx < 0 || next < 0 || next >= blocks.length) return;
-    const tmp = blocks[idx];
-    blocks[idx] = blocks[next];
-    blocks[next] = tmp;
-    updateEditing({ blocks });
-  };
-
-  const removeBlock = (blockId: string) => {
-    if (!editing) return;
-    if (editing.blocks.length <= 1) {
-      notify('error', 'Keep at least one block');
-      return;
-    }
-    updateEditing({ blocks: editing.blocks.filter((b) => b.id !== blockId) });
-  };
-
   const toggleClassic = () => {
     if (!editing) return;
     if (!classicMode) {
@@ -200,12 +199,12 @@ function BlogsAdmin({
     }
   };
 
-  const uploadImage = async (file: File): Promise<string | null> => {
+  const uploadMedia = async (file: File): Promise<string | null> => {
     setUploading(true);
     try {
       const form = new FormData();
       form.append('file', file);
-      const res = await fetch('/api/blogs/upload', {
+      const res = await fetch(cfg.upload, {
         method: 'POST',
         credentials: 'same-origin',
         body: form,
@@ -228,16 +227,18 @@ function BlogsAdmin({
     const file = e.target.files?.[0];
     e.target.value = '';
     if (!file || !editing) return;
-    const url = await uploadImage(file);
+    const url = await uploadMedia(file);
     if (url) updateEditing({ coverImage: url });
   };
 
-  const onBlockImageUpload = async (e: ChangeEvent<HTMLInputElement>, blockId: string) => {
-    const file = e.target.files?.[0];
-    e.target.value = '';
-    if (!file) return;
-    const url = await uploadImage(file);
-    if (url) updateBlock(blockId, { mediaUrl: url });
+  const onBlockMediaUpload = async (file: File, blockId: string, kind: 'image' | 'video') => {
+    const url = await uploadMedia(file);
+    if (!url || !editing) return;
+    updateEditing({
+      blocks: editing.blocks.map((b) =>
+        b.id === blockId ? { ...b, mediaUrl: url, type: kind === 'video' ? 'video' : b.type } : b,
+      ),
+    });
   };
 
   const approveComment = (postId: string, commentId: string) => {
@@ -299,11 +300,10 @@ function BlogsAdmin({
     });
   };
 
-  if (loading) return <p className="superadmin-empty">Loading blog posts…</p>;
+  if (loading) return <p className="superadmin-empty">{cfg.emptyMessage}</p>;
 
   /* —— EDITOR —— */
   if (editing) {
-    const score = calcSeoScore(editing);
     const statsBar = wordStats(classicMode ? classicToBlocks(classicText) : editing.blocks);
 
     return (
@@ -311,20 +311,30 @@ function BlogsAdmin({
         <div className="wp-blog__editor-top">
           <div className="wp-blog__crumbs">
             <button type="button" className="superadmin-back" onClick={() => setEditingId(null)}>
-              ← Back to Pages List
+              ← Posts
             </button>
             <span>
-              Dashboard / Blog / <strong>{editing.title || 'Untitled'}</strong>
+              {cfg.label} / <strong>{editing.title || `Untitled ${cfg.label}`}</strong>
             </span>
           </div>
           <div className="wp-blog__editor-top-actions">
+            {editing.slug ? (
+              <a
+                className="wp-blog__preview-link"
+                href={`${cfg.pathPrefix}/${editing.slug}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Preview
+              </a>
+            ) : null}
             <button
               type="button"
               className="superadmin-btn superadmin-btn--ghost"
               onClick={saveDraft}
               disabled={saving}
             >
-              Save Draft
+              Save draft
             </button>
             <button
               type="button"
@@ -332,7 +342,11 @@ function BlogsAdmin({
               onClick={publishUpdate}
               disabled={saving}
             >
-              {saving ? 'Saving…' : 'Update'}
+              {saving
+                ? 'Saving…'
+                : editing.status === 'published'
+                  ? 'Update'
+                  : 'Publish'}
             </button>
           </div>
         </div>
@@ -355,70 +369,21 @@ function BlogsAdmin({
             />
 
             <div className="wp-blog__permalink">
-              <span>kiteinstitute.com/blog/</span>
+              <span>Permalink:</span>
+              <span className="wp-blog__permalink-base">{cfg.pathPrefix}/</span>
               <input
                 value={editing.slug}
                 onChange={(e) => updateEditing({ slug: slugify(e.target.value) })}
               />
             </div>
 
-            <label className="wp-blog__excerpt">
-              <span>Excerpt / Excerpt Summary</span>
-              <textarea
-                rows={2}
-                value={editing.excerpt || ''}
-                placeholder="Write a short summary teaser…"
-                onChange={(e) => updateEditing({ excerpt: e.target.value })}
-              />
-            </label>
-
-            <div className="wp-blog__toolbar">
-              <button type="button" onClick={() => setShowInserter((v) => !v)} title="Add block">
-                +
-              </button>
-              <button type="button" onClick={() => insertBlock('paragraph')}>
-                ¶ Paragraph
-              </button>
-              <button type="button" onClick={() => insertBlock('h2')}>
-                Heading
-              </button>
-              <button type="button" onClick={() => insertBlock('list')}>
-                List
-              </button>
-              <button type="button" onClick={() => insertBlock('image')}>
-                Image
-              </button>
-              <button type="button" className="wp-blog__toolbar-switch" onClick={toggleClassic}>
-                {classicMode ? 'Switch to Block Editor' : 'Switch to Classic Editor'}
-              </button>
-            </div>
-
-            {showInserter && (
-              <div className="wp-blog__inserter">
-                {(
-                  [
-                    ['paragraph', 'Paragraph'],
-                    ['h1', 'Heading 1'],
-                    ['h2', 'Heading 2'],
-                    ['h3', 'Heading 3'],
-                    ['list', 'List'],
-                    ['image', 'Image'],
-                    ['quote', 'Quote'],
-                    ['youtube', 'YouTube'],
-                  ] as const
-                ).map(([type, label]) => (
-                  <button key={type} type="button" onClick={() => insertBlock(type, activeBlockId)}>
-                    {label}
-                  </button>
-                ))}
-              </div>
-            )}
-
             {classicMode ? (
               <div className="wp-blog__classic">
                 <div className="wp-blog__classic-bar">
-                  <span>Classic Editor WYSIWYG Mode</span>
-                  <span className="wp-blog__chip">TINY_MCE</span>
+                  <span>Classic editor</span>
+                  <button type="button" className="wp-blog__text-btn" onClick={toggleClassic}>
+                    Switch to block editor
+                  </button>
                 </div>
                 <textarea
                   className="wp-blog__classic-area"
@@ -428,73 +393,25 @@ function BlogsAdmin({
                 />
               </div>
             ) : (
-              <div className="wp-blog__blocks">
-                {editing.blocks.map((block) => (
-                  <div
-                    key={block.id}
-                    className={`wp-blog__block ${activeBlockId === block.id ? 'is-active' : ''}`}
-                    onClick={() => setActiveBlockId(block.id)}
-                  >
-                    <div className="wp-blog__block-label">
-                      <span>{block.type.replace('-', ' ')} block</span>
-                      <div className="wp-blog__block-tools">
-                        <button type="button" onClick={() => moveBlock(block.id, -1)}>
-                          ↑
-                        </button>
-                        <button type="button" onClick={() => moveBlock(block.id, 1)}>
-                          ↓
-                        </button>
-                        <button type="button" onClick={() => removeBlock(block.id)}>
-                          ✕
-                        </button>
-                      </div>
-                    </div>
-
-                    {block.type === 'image' ? (
-                      <div className="wp-blog__block-image">
-                        {block.mediaUrl ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img src={block.mediaUrl} alt={block.content || ''} />
-                        ) : null}
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={(e) => onBlockImageUpload(e, block.id)}
-                          disabled={uploading}
-                        />
-                        <input
-                          type="text"
-                          placeholder="Image alt text"
-                          value={block.content}
-                          onChange={(e) => updateBlock(block.id, { content: e.target.value })}
-                        />
-                      </div>
-                    ) : block.type === 'list' || block.type === 'paragraph' || block.type === 'quote' ? (
-                      <textarea
-                        rows={block.type === 'paragraph' ? 3 : 4}
-                        value={block.content}
-                        onChange={(e) => updateBlock(block.id, { content: e.target.value })}
-                        placeholder={
-                          block.type === 'list' ? '- Item one\n- Item two' : 'Write content…'
-                        }
-                      />
-                    ) : (
-                      <input
-                        type="text"
-                        value={block.content}
-                        onChange={(e) => updateBlock(block.id, { content: e.target.value })}
-                        placeholder={block.type === 'youtube' ? 'YouTube URL' : 'Heading'}
-                      />
-                    )}
-                  </div>
-                ))}
-              </div>
+              <BlogBlockEditor
+                blocks={editing.blocks}
+                activeBlockId={activeBlockId}
+                uploading={uploading}
+                onChangeBlocks={(blocks) => updateEditing({ blocks })}
+                onActiveBlockId={setActiveBlockId}
+                onUploadMedia={onBlockMediaUpload}
+              />
             )}
 
             <div className="wp-blog__stats-bar">
-              <span>{statsBar.words} words</span>
-              <span>{statsBar.blocks} block{statsBar.blocks === 1 ? '' : 's'}</span>
-              <span>{statsBar.minutes} min read</span>
+              <div className="wp-blog__stats-bar-left">
+                <span>{statsBar.words} words</span>
+                <span>{statsBar.blocks} block{statsBar.blocks === 1 ? '' : 's'}</span>
+                <span>{statsBar.minutes} min read</span>
+              </div>
+              <button type="button" className="wp-blog__text-btn" onClick={toggleClassic}>
+                {classicMode ? 'Block editor' : 'Code editor'}
+              </button>
             </div>
           </div>
 
@@ -505,7 +422,7 @@ function BlogsAdmin({
                 className={sidebarTab === 'page' ? 'is-active' : ''}
                 onClick={() => setSidebarTab('page')}
               >
-                Page
+                Post
               </button>
               <button
                 type="button"
@@ -519,19 +436,7 @@ function BlogsAdmin({
             {sidebarTab === 'page' ? (
               <>
                 <div className="wp-blog__card">
-                  <div className="wp-blog__card-actions">
-                    <button type="button" className="wp-blog__link" onClick={saveDraft}>
-                      Save Draft
-                    </button>
-                    <button
-                      type="button"
-                      className="superadmin-btn superadmin-btn--primary"
-                      onClick={publishUpdate}
-                      disabled={saving}
-                    >
-                      Update
-                    </button>
-                  </div>
+                  <h4>Status & visibility</h4>
                   <label>
                     <span>Status</span>
                     <select
@@ -555,12 +460,21 @@ function BlogsAdmin({
                       onChange={(e) => updateEditing({ createdAt: e.target.value })}
                     />
                   </label>
+                  <label>
+                    <span>Excerpt</span>
+                    <textarea
+                      rows={3}
+                      value={editing.excerpt || ''}
+                      placeholder="Write an excerpt (optional)"
+                      onChange={(e) => updateEditing({ excerpt: e.target.value })}
+                    />
+                  </label>
                   <button
                     type="button"
                     className="wp-blog__trash"
                     onClick={() => trashPost(editing.id)}
                   >
-                    Move to Trash
+                    Move to trash
                   </button>
                 </div>
 
@@ -583,38 +497,21 @@ function BlogsAdmin({
                   )}
                 </div>
 
-                <div className="wp-blog__card">
-                  <div className="wp-blog__seo-head">
-                    <h4>RankMath SEO</h4>
-                    <span className={`wp-blog__seo-score ${seoBarClass(score)}`}>{score}/100</span>
-                  </div>
-                  <div className="wp-blog__seo-meter">
-                    <i style={{ width: `${score}%` }} className={seoBarClass(score)} />
-                  </div>
-                  <label>
-                    <span>Focus Keyword</span>
-                    <input
-                      value={editing.focusKeyword || ''}
-                      placeholder="e.g. aviation career"
-                      onChange={(e) => updateEditing({ focusKeyword: e.target.value })}
-                    />
-                  </label>
-                  <label>
-                    <span>SEO Meta Title</span>
-                    <input
-                      value={editing.metaTitle}
-                      onChange={(e) => updateEditing({ metaTitle: e.target.value })}
-                    />
-                  </label>
-                  <label>
-                    <span>SEO Meta Description</span>
-                    <textarea
-                      rows={3}
-                      value={editing.metaDescription}
-                      onChange={(e) => updateEditing({ metaDescription: e.target.value })}
-                    />
-                  </label>
-                </div>
+                <BlogSeoPanel
+                  post={editing}
+                  pathPrefix={cfg.pathPrefix}
+                  siteOrigin={
+                    typeof window !== 'undefined'
+                      ? window.location.origin
+                      : 'https://kiteaviation.in'
+                  }
+                  onChange={updateEditing}
+                  uploadingOg={uploading}
+                  onUploadOgImage={async (file) => {
+                    const url = await uploadMedia(file);
+                    if (url) updateEditing({ ogImage: url });
+                  }}
+                />
 
                 <div className="wp-blog__card">
                   <h4>Categories & Tags</h4>
@@ -629,7 +526,7 @@ function BlogsAdmin({
                         })
                       }
                     >
-                      {BLOG_CATEGORIES.map((c) => (
+                      {cfg.categories.map((c) => (
                         <option key={c} value={c}>
                           {c}
                         </option>
@@ -663,7 +560,7 @@ function BlogsAdmin({
                       checked={Boolean(editing.isPinned)}
                       onChange={(e) => updateEditing({ isPinned: e.target.checked })}
                     />
-                    Pin to top of blog feed
+                    {cfg.pinLabel}
                   </label>
                 </div>
               </>
@@ -736,12 +633,12 @@ function BlogsAdmin({
           <div className="wp-blog__feed-head">
             <div>
               <div className="wp-blog__feed-title-row">
-                <h2>Articles Feed</h2>
+                <h2>{cfg.feedTitle}</h2>
                 <button type="button" className="superadmin-btn superadmin-btn--ghost" onClick={addPost}>
                   + Add New Post
                 </button>
               </div>
-              <p>Manage blog posts, configure URLs, and write SEO content to rank on search engines.</p>
+              <p>{cfg.feedHelp}</p>
             </div>
             <button
               type="button"
@@ -777,7 +674,7 @@ function BlogsAdmin({
                   {posts
                     .filter((p) => p.status !== 'archived')
                     .map((post) => {
-                      const score = calcListSeoScore(post);
+                      const score = calcRankMathScore(post);
                       return (
                         <tr key={post.id}>
                           <td>
@@ -785,7 +682,9 @@ function BlogsAdmin({
                             {post.title}
                           </td>
                           <td>
-                            <code>/blog/{post.slug}</code>
+                            <code>
+                              {cfg.pathPrefix}/{post.slug}
+                            </code>
                           </td>
                           <td>{post.createdAt}</td>
                           <td>

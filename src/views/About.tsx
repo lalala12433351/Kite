@@ -2,40 +2,9 @@
 
 import { Link } from '@/lib/router';
 import UsefulLinksSection from '../components/UsefulLinksSection';
+import AirlinesList from '../components/AirlinesList';
 
 function About() {
-  const airlines = [
-    { name: 'airindia', url: 'https://www.airindia.com/' },
-    { name: 'emirates', url: 'https://www.emirates.com/ie/english/' },
-    { name: 'etihad', url: 'https://www.etihad.com/' },
-    { name: 'qatar', url: 'https://www.qatarairways.com/' },
-    { name: 'kuwait', url: 'https://www.kuwaitairways.com/en' },
-    { name: 'indigo', url: 'https://www.goindigo.in/' },
-    { name: 'spice', url: 'https://www.spicejet.com/' },
-    { name: 'airasia', url: 'https://www.airasia.com/' },
-    { name: 'akasaair', url: 'https://www.akasaair.com/' },
-    { name: 'starair', url: 'https://www.starair.in/' },
-    { name: 'vistara', url: 'https://www.airvistara.com/' },
-    { name: 'airindiaexpress', url: 'https://www.airindiaexpress.com/' },
-    { name: 'celebi', url: 'https://www.celebiaviation.com/' },
-    { name: 'airarabia', url: 'https://www.airarabia.com/' },
-    { name: 'american', url: 'https://www.aa.com/homePage.do?locale=en_US' },
-    { name: 'airindiasats', url: 'https://www.aisats.in/' },
-    { name: 'bwfs', url: 'https://www.bird.in/businessverticals/aviation-services.html' },
-    { name: 'gaar', url: 'https://www.gmrgroup.in/airports/' },
-    { name: 'itc', url: 'https://www.itcportal.com/' },
-    { name: 'harley', url: 'https://www.harley-davidson.com/', className: 'auto' },
-    { name: 'easymytrip', url: 'https://www.easemytrip.ae/', className: 'travel' },
-    { name: 'vfs', url: 'https://www.vfsglobal.com/en/individuals/index.html', className: 'travel' },
-    { name: 'parkhyat', url: 'https://www.hyatt.com/', className: 'hotel' },
-    { name: 'theleela', url: 'https://www.theleela.com/', className: 'hotel' },
-    { name: 'obroi', url: 'https://www.oberoihotels.com/', className: 'hotel' },
-    { name: 'taj', url: 'https://www.tajhotels.com/en-in', className: 'hotel' },
-    { name: 'jw', url: 'https://www.jw-marriott.marriott.com/', className: 'hotel' },
-    { name: 'radisson', url: 'https://www.radissonhotels.com/', className: 'hotel' },
-    { name: 'westin', url: 'https://www.westin.marriott.com/', className: 'hotel' }
-  ];
-
   const courses = [
     { id: 1, title: 'Kite Diploma Course in Aviation, Hospitality and Travel Management', duration: '12 Months, 5 days/week (Mon- Fri) 2 hours' },
     { id: 5, title: 'Airport Operations Fundamentals', duration: '6 Months, 5 days/week (Mon-Fri) 2 hours' },
@@ -72,18 +41,7 @@ function About() {
           </div>
 
           <h3>Where Careers Take Off – Top Hiring Airlines</h3>
-          <div className="list-of-airlines">
-            {airlines.map((airline, index) => (
-              <a
-                key={index}
-                href={airline.url}
-                                rel="noopener noreferrer"
-                className={`card tooltip-btn ${airline.name} ${airline.className || ''}`}
-              >
-                <span className="tooltip-txt">{airline.url}</span>
-              </a>
-            ))}
-          </div>
+          <AirlinesList />
 
           <div className="text">
             At Kite Institute of Aviation & Hospitality, we believe that the sky is not the limit—it's just the beginning.

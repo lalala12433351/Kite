@@ -41,13 +41,17 @@ export default function sitemap() {
     const file = path.join(process.cwd(), 'data', 'news-posts.json');
     const posts = JSON.parse(fs.readFileSync(file, 'utf8'));
     for (const post of posts) {
+      if (!post?.slug) continue;
+      if (post.status && post.status !== 'published' && !post.isPublished) continue;
       entries.push({
-        url: `${BASE}/news/${post.id}`,
-        lastModified: post.created_at ? new Date(post.created_at) : now,
+        url: `${BASE}/news/${post.slug}`,
+        lastModified: post.createdAt || post.created_at
+          ? new Date(post.createdAt || post.created_at)
+          : now,
       });
     }
   } catch {
-    /* news file is connected at the end of the migration */
+    /* news optional until first save */
   }
 
   try {

@@ -3,18 +3,43 @@ export type BlogBlockType =
   | 'h1'
   | 'h2'
   | 'h3'
+  | 'h4'
   | 'list'
   | 'image'
   | 'quote'
-  | 'youtube';
+  | 'video'
+  | 'youtube'
+  | 'separator'
+  | 'html';
 
 export type BlogBlock = {
   id: string;
   type: BlogBlockType;
   content: string;
   mediaUrl?: string;
-  align?: 'left' | 'center' | 'right';
+  align?: 'left' | 'center' | 'right' | 'wide' | 'full';
 };
+
+export const BLOG_BLOCK_CATALOG: {
+  type: BlogBlockType;
+  label: string;
+  description: string;
+  category: 'text' | 'media' | 'design' | 'embed';
+  icon: string;
+}[] = [
+  { type: 'paragraph', label: 'Paragraph', description: 'Start with the building block of all narrative.', category: 'text', icon: '¶' },
+  { type: 'h1', label: 'Heading 1', description: 'Big section heading.', category: 'text', icon: 'H1' },
+  { type: 'h2', label: 'Heading 2', description: 'Medium section heading.', category: 'text', icon: 'H2' },
+  { type: 'h3', label: 'Heading 3', description: 'Small section heading.', category: 'text', icon: 'H3' },
+  { type: 'h4', label: 'Heading 4', description: 'Subsection heading.', category: 'text', icon: 'H4' },
+  { type: 'list', label: 'List', description: 'Create a bulleted list.', category: 'text', icon: '≡' },
+  { type: 'quote', label: 'Quote', description: 'Give quoted text visual emphasis.', category: 'text', icon: '❝' },
+  { type: 'image', label: 'Image', description: 'Insert an image.', category: 'media', icon: '▣' },
+  { type: 'video', label: 'Video', description: 'Upload or embed a video file.', category: 'media', icon: '▶' },
+  { type: 'youtube', label: 'YouTube', description: 'Embed a YouTube video.', category: 'embed', icon: '▶' },
+  { type: 'separator', label: 'Separator', description: 'Create a break between sections.', category: 'design', icon: '—' },
+  { type: 'html', label: 'Custom HTML', description: 'Add custom HTML code.', category: 'design', icon: '</>' },
+];
 
 export type BlogComment = {
   id: string;
@@ -27,6 +52,8 @@ export type BlogComment = {
 };
 
 export type BlogStatus = 'draft' | 'scheduled' | 'published' | 'archived';
+
+export type BlogSchemaType = 'BlogPosting' | 'NewsArticle' | 'Article';
 
 export type BlogPost = {
   id: string;
@@ -48,6 +75,15 @@ export type BlogPost = {
   tags: string[];
   isPinned?: boolean;
   focusKeyword?: string;
+  /** Social / Open Graph overrides */
+  ogTitle?: string;
+  ogDescription?: string;
+  ogImage?: string;
+  /** Advanced SEO */
+  canonicalUrl?: string;
+  robotsIndex?: boolean;
+  robotsFollow?: boolean;
+  schemaType?: BlogSchemaType;
   views: number;
   likes: number;
   shares: number;
@@ -60,6 +96,15 @@ export const BLOG_CATEGORIES = [
   'Career Guidance',
   'Campus Life',
   'Industry News',
+];
+
+export const NEWS_CATEGORIES = [
+  'Industry News',
+  'Campus Updates',
+  'Student Achievements',
+  'Aviation',
+  'Hospitality',
+  'Press',
 ];
 
 function uid(prefix: string) {
@@ -77,32 +122,36 @@ export function slugify(input: string) {
 }
 
 export function createEmptyBlock(type: BlogBlockType = 'paragraph'): BlogBlock {
+  const contentByType: Partial<Record<BlogBlockType, string>> = {
+    paragraph: '',
+    h1: 'Heading',
+    h2: 'Heading',
+    h3: 'Heading',
+    h4: 'Heading',
+    list: '- First point\n- Second point',
+    quote: 'Write quote…',
+    image: '',
+    video: '',
+    youtube: 'https://www.youtube.com/watch?v=',
+    separator: '',
+    html: '<!-- custom html -->',
+  };
   return {
     id: uid('block'),
     type,
-    content:
-      type === 'h2'
-        ? 'Heading'
-        : type === 'list'
-          ? '- First point\n- Second point'
-          : type === 'image'
-            ? ''
-            : type === 'youtube'
-              ? 'https://www.youtube.com/watch?v='
-              : type === 'quote'
-                ? 'Quote text'
-                : '',
-    mediaUrl: type === 'image' ? '/images/himg-1.jpg' : undefined,
+    content: contentByType[type] ?? '',
+    mediaUrl: undefined,
     align: 'left',
   };
 }
 
-export function createEmptyPost(): BlogPost {
+export function createEmptyPost(kind: 'blog' | 'news' = 'blog'): BlogPost {
   const today = new Date().toISOString().slice(0, 10);
+  const categories = kind === 'news' ? NEWS_CATEGORIES : BLOG_CATEGORIES;
   return {
-    id: uid('blog'),
+    id: uid(kind === 'news' ? 'news' : 'blog'),
     slug: 'new-post',
-    title: 'Untitled Post',
+    title: kind === 'news' ? 'Untitled News' : 'Untitled Post',
     metaTitle: '',
     metaDescription: '',
     coverImage: '',
@@ -113,70 +162,23 @@ export function createEmptyPost(): BlogPost {
     status: 'draft',
     authorName: 'Kite Institute',
     authorBio: '',
-    category: BLOG_CATEGORIES[0],
-    categories: [BLOG_CATEGORIES[0]],
+    category: categories[0],
+    categories: [categories[0]],
     tags: [],
     isPinned: false,
     focusKeyword: '',
+    ogTitle: '',
+    ogDescription: '',
+    ogImage: '',
+    canonicalUrl: '',
+    robotsIndex: true,
+    robotsFollow: true,
+    schemaType: kind === 'news' ? 'NewsArticle' : 'BlogPosting',
     views: 0,
     likes: 0,
     shares: 0,
     comments: [],
   };
-}
-
-export function calcSeoScore(post: BlogPost): number {
-  let score = 0;
-  const keyword = String(post.focusKeyword || '')
-    .trim()
-    .toLowerCase();
-  const title = String(post.title || '').toLowerCase();
-  const slug = String(post.slug || '').toLowerCase();
-  const metaTitle = String(post.metaTitle || '');
-  const metaDesc = String(post.metaDescription || '');
-
-  if (keyword) {
-    score += 20;
-    if (title.includes(keyword)) score += 20;
-    if (slug.includes(keyword.replace(/\s+/g, '-'))) score += 15;
-    if (metaDesc.toLowerCase().includes(keyword)) score += 15;
-  }
-  if (metaTitle.length >= 45 && metaTitle.length <= 60) score += 10;
-  if (metaDesc.length >= 120 && metaDesc.length <= 160) score += 10;
-
-  const imageBlocks = (post.blocks || []).filter((b) => b.type === 'image');
-  if (imageBlocks.length > 0 && imageBlocks.every((b) => String(b.content || '').trim())) {
-    score += 10;
-  }
-
-  return Math.min(100, score);
-}
-
-export function calcListSeoScore(post: BlogPost): number {
-  const keyword = String(post.focusKeyword || '')
-    .trim()
-    .toLowerCase();
-  if (!keyword) return 50;
-  let score = 20;
-  if (String(post.title || '')
-    .toLowerCase()
-    .includes(keyword))
-    score += 20;
-  if (
-    String(post.slug || '')
-      .toLowerCase()
-      .includes(keyword.replace(/\s+/g, '-'))
-  )
-    score += 20;
-  if (
-    String(post.metaDescription || '')
-      .toLowerCase()
-      .includes(keyword)
-  )
-    score += 20;
-  const len = String(post.metaDescription || '').length;
-  if (len >= 120 && len <= 160) score += 20;
-  return Math.min(100, score);
 }
 
 export function blocksToClassic(blocks: BlogBlock[]): string {
@@ -185,13 +187,17 @@ export function blocksToClassic(blocks: BlogBlock[]): string {
       if (b.type === 'h1') return `# ${b.content}`;
       if (b.type === 'h2') return `## ${b.content}`;
       if (b.type === 'h3') return `### ${b.content}`;
+      if (b.type === 'h4') return `#### ${b.content}`;
       if (b.type === 'image') return b.mediaUrl ? `<img src="${b.mediaUrl}" alt="${b.content || ''}" />` : '';
+      if (b.type === 'video') return b.mediaUrl ? `<video src="${b.mediaUrl}"></video>` : b.content;
       if (b.type === 'list') return b.content;
       if (b.type === 'quote') return `> ${b.content}`;
+      if (b.type === 'separator') return '---';
+      if (b.type === 'html') return b.content;
       if (b.type === 'youtube') return b.content;
       return b.content;
     })
-    .filter(Boolean)
+    .filter((part) => part !== undefined && part !== null)
     .join('\n\n');
 }
 
@@ -202,6 +208,8 @@ export function classicToBlocks(text: string): BlogBlock[] {
     .filter(Boolean);
   if (!parts.length) return [createEmptyBlock('paragraph')];
   return parts.map((part) => {
+    if (part === '---') return createEmptyBlock('separator');
+    if (part.startsWith('#### ')) return { ...createEmptyBlock('h4'), content: part.slice(5) };
     if (part.startsWith('### ')) return { ...createEmptyBlock('h3'), content: part.slice(4) };
     if (part.startsWith('## ')) return { ...createEmptyBlock('h2'), content: part.slice(3) };
     if (part.startsWith('# ')) return { ...createEmptyBlock('h1'), content: part.slice(2) };
@@ -212,6 +220,12 @@ export function classicToBlocks(text: string): BlogBlock[] {
       const alt = part.match(/alt=["']([^"']*)["']/i)?.[1] || '';
       return { ...createEmptyBlock('image'), mediaUrl: img[1], content: alt };
     }
+    const video = part.match(/<video[^>]+src=["']([^"']+)["'][^>]*>/i);
+    if (video) return { ...createEmptyBlock('video'), mediaUrl: video[1] };
+    if (/youtu\.?be|youtube\.com/i.test(part)) {
+      return { ...createEmptyBlock('youtube'), content: part };
+    }
+    if (/^</.test(part)) return { ...createEmptyBlock('html'), content: part };
     return { ...createEmptyBlock('paragraph'), content: part };
   });
 }

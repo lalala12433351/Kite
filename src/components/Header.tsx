@@ -1,7 +1,7 @@
 'use client';
 
 import { Link, useLocation } from '@/lib/router';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 // Get base URL for assets
 const getAssetUrl = (path) => `${'/'}${path}`;
@@ -9,16 +9,23 @@ const getAssetUrl = (path) => `${'/'}${path}`;
 function Header() {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isStudentHubOpen, setIsStudentHubOpen] = useState(false);
+  const studentHubRef = useRef(null);
 
   const isActive = (path) => {
-    if (path === '/news') {
-      return location.pathname === '/news' || location.pathname.startsWith('/news/') ? 'active' : '';
-    }
     if (path === '/blog') {
       return location.pathname === '/blog' || location.pathname.startsWith('/blog/') ? 'active' : '';
     }
     return location.pathname === path ? 'active' : '';
   };
+
+  const isStudentHubActive =
+    location.pathname === '/student-hub' ||
+    location.pathname.startsWith('/students') ||
+    location.pathname.startsWith('/certificate') ||
+    location.pathname.startsWith('/virtual-classroom')
+      ? 'active'
+      : '';
 
   // Handle mobile menu toggle - add/remove class to body
   useEffect(() => {
@@ -33,9 +40,35 @@ function Header() {
     };
   }, [isMobileMenuOpen]);
 
+  // Close Student Hub dropdown on outside click / Escape / route change
+  useEffect(() => {
+    setIsStudentHubOpen(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    if (!isStudentHubOpen) return undefined;
+
+    const onPointerDown = (e) => {
+      if (studentHubRef.current && !studentHubRef.current.contains(e.target)) {
+        setIsStudentHubOpen(false);
+      }
+    };
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') setIsStudentHubOpen(false);
+    };
+
+    document.addEventListener('pointerdown', onPointerDown);
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown);
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [isStudentHubOpen]);
+
   // Close menu when clicking on a link
   const handleLinkClick = () => {
     setIsMobileMenuOpen(false);
+    setIsStudentHubOpen(false);
   };
 
   return (
@@ -76,12 +109,6 @@ function Header() {
             </div>
           </Link>
           
-          <Link to="/news" className={`item ${isActive('/news')}`} onClick={handleLinkClick}>
-            <div className="text">
-              <div className="front">News & Updates</div>
-            </div>
-          </Link>
-
           <Link to="/blog" className={`item ${isActive('/blog')}`} onClick={handleLinkClick}>
             <div className="text">
               <div className="front">Blog</div>
@@ -93,12 +120,64 @@ function Header() {
               <div className="front">Media Gallery</div>
             </div>
           </Link>
-          
-          <Link to="/student-hub" className={`item ${isActive('/student-hub')}`} onClick={handleLinkClick}>
-            <div className="text">
-              <div className="front">Student Hub</div>
+
+          <div
+            className={`nav-dropdown ${isStudentHubOpen ? 'is-open' : ''} ${isStudentHubActive}`}
+            ref={studentHubRef}
+          >
+            <button
+              type="button"
+              className="item nav-dropdown__trigger"
+              aria-expanded={isStudentHubOpen}
+              aria-haspopup="true"
+              onClick={() => setIsStudentHubOpen((open) => !open)}
+            >
+              <div className="text">
+                <div className="front">Student Hub</div>
+              </div>
+              <span className="nav-dropdown__caret" aria-hidden="true" />
+            </button>
+            <div className="nav-dropdown__menu" role="menu">
+              <Link
+                className={`nav-dropdown__item ${isActive('/student-hub')}`}
+                role="menuitem"
+                to="/student-hub"
+                onClick={handleLinkClick}
+              >
+                Overview
+              </Link>
+              <Link
+                className={`nav-dropdown__item ${location.pathname.startsWith('/students') || location.pathname.startsWith('/certificate') ? 'active' : ''}`}
+                role="menuitem"
+                to="/certificate"
+                onClick={handleLinkClick}
+              >
+                Certificate Verification
+              </Link>
+              <Link
+                className={`nav-dropdown__item ${location.pathname.startsWith('/virtual-classroom') ? 'active' : ''}`}
+                role="menuitem"
+                to="/virtual-classroom-login"
+                onClick={handleLinkClick}
+              >
+                Virtual Classroom
+              </Link>
+              <span className="nav-dropdown__item nav-dropdown__item--disabled" role="menuitem">
+                Flight Announcements
+                <span className="nav-dropdown__badge">Coming Soon</span>
+              </span>
+              <a
+                href="https://kiteaviation.in/quiz"
+                className="nav-dropdown__item"
+                target="_blank"
+                rel="noopener noreferrer"
+                role="menuitem"
+                onClick={handleLinkClick}
+              >
+                Aviation Quiz
+              </a>
             </div>
-          </Link>
+          </div>
 
           <Link to="/team" className={`item ${isActive('/team')}`} onClick={handleLinkClick}>
             <div className="text">
@@ -124,4 +203,3 @@ function Header() {
 }
 
 export default Header;
-

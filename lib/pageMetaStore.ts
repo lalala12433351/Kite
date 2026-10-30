@@ -6,6 +6,7 @@ import {
   type PageMetaEntry,
   type PageMetaKey,
 } from '@/lib/pageMetaDefaults';
+import { atomicWriteJson } from '@/lib/safeJsonStore';
 
 const FILE = path.join(dataDir, 'page-meta.json');
 
@@ -44,7 +45,7 @@ export function writePageMetaOverrides(overrides: PageMetaOverrides) {
       ...(keywords ? { keywords } : {}),
     };
   }
-  fs.writeFileSync(FILE, `${JSON.stringify(cleaned, null, 2)}\n`, 'utf8');
+  atomicWriteJson(FILE, cleaned);
   return cleaned;
 }
 

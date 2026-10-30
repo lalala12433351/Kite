@@ -8,47 +8,18 @@ import VideoGallery from '../components/VideoGallery';
 import UsefulLinksSection from '../components/UsefulLinksSection';
 import StudentSuccessStoriesSection from '../components/StudentSuccessStoriesSection';
 import HomeFaqCtaSection from '../components/HomeFaqCtaSection';
-import HomeHeroBanner from '../components/HomeHeroBanner';
+import AirlinesList from '../components/AirlinesList';
 
 // Get base URL for assets
 const getAssetUrl = (path) => `${'/'}${path}`;
 
 function Home() {
+  const [typing1Text, setTyping1Text] = useState('');
+  const [typing2Text, setTyping2Text] = useState('');
+  const [circlesVisible, setCirclesVisible] = useState(false);
   const [visibleCircles, setVisibleCircles] = useState([]);
   const [showGoogleReviews, setShowGoogleReviews] = useState(false);
   const [activeWhyChooseCard, setActiveWhyChooseCard] = useState(null);
-
-  const airlines = [
-    { name: 'airindia', url: 'https://www.airindia.com/' },
-    { name: 'emirates', url: 'https://www.emirates.com/ie/english/' },
-    { name: 'etihad', url: 'https://www.etihad.com/' },
-    { name: 'qatar', url: 'https://www.qatarairways.com/' },
-    { name: 'kuwait', url: 'https://www.kuwaitairways.com/en' },
-    { name: 'indigo', url: 'https://www.goindigo.in/' },
-    { name: 'spice', url: 'https://www.spicejet.com/' },
-    { name: 'airasia', url: 'https://www.airasia.com/' },
-    { name: 'akasaair', url: 'https://www.akasaair.com/' },
-    { name: 'starair', url: 'https://www.starair.in/' },
-    { name: 'vistara', url: 'https://www.airvistara.com/' },
-    { name: 'airindiaexpress', url: 'https://www.airindiaexpress.com/' },
-    { name: 'celebi', url: 'https://www.celebiaviation.com/' },
-    { name: 'airarabia', url: 'https://www.airarabia.com/' },
-    { name: 'american', url: 'https://www.aa.com/homePage.do?locale=en_US' },
-    { name: 'airindiasats', url: 'https://www.aisats.in/' },
-    { name: 'bwfs', url: 'https://www.bird.in/businessverticals/aviation-services.html' },
-    { name: 'gaar', url: 'https://www.gmrgroup.in/airports/' },
-    { name: 'itc', url: 'https://www.itcportal.com/' },
-    { name: 'harley', url: 'https://www.harley-davidson.com/', className: 'auto' },
-    { name: 'easymytrip', url: 'https://www.easemytrip.ae/', className: 'travel' },
-    { name: 'vfs', url: 'https://www.vfsglobal.com/en/individuals/index.html', className: 'travel' },
-    { name: 'parkhyat', url: 'https://www.hyatt.com/', className: 'hotel' },
-    { name: 'theleela', url: 'https://www.theleela.com/', className: 'hotel' },
-    { name: 'obroi', url: 'https://www.oberoihotels.com/', className: 'hotel' },
-    { name: 'taj', url: 'https://www.tajhotels.com/en-in', className: 'hotel' },
-    { name: 'jw', url: 'https://www.jw-marriott.marriott.com/', className: 'hotel' },
-    { name: 'radisson', url: 'https://www.radissonhotels.com/', className: 'hotel' },
-    { name: 'westin', url: 'https://www.westin.marriott.com/', className: 'hotel' }
-  ];
 
   const courses = [
     { title: 'Kite Diploma Course in Aviation, Hospitality and Travel Management', duration: '12 Months, 5 days/week (Mon- Fri) 2 hours' },
@@ -107,16 +78,47 @@ function Home() {
   ];
 
   useEffect(() => {
-    const circleIndices = [0, 1, 2, 3, 4];
-    const timers = circleIndices.map((index, i) =>
-      window.setTimeout(() => {
-        setVisibleCircles((prev) => [...prev, index]);
-        if (index === 4) {
-          window.setTimeout(() => setShowGoogleReviews(true), 200);
-        }
-      }, i * 150),
-    );
-    return () => timers.forEach((id) => window.clearTimeout(id));
+    // Typing effect for first line - faster and smoother
+    const text1 = "India's Most Trusted";
+    let i = 0;
+    const typeInterval1 = setInterval(() => {
+      if (i <= text1.length) {
+        setTyping1Text(text1.substring(0, i));
+        i++;
+      } else {
+        clearInterval(typeInterval1);
+        // Start second typing effect
+        const text2 = "Aviation Training Institute";
+        let j = 0;
+        const typeInterval2 = setInterval(() => {
+          if (j <= text2.length) {
+            setTyping2Text(text2.substring(0, j));
+            j++;
+          } else {
+            clearInterval(typeInterval2);
+            // Show circles immediately without delay
+            setCirclesVisible(true);
+            // Staggered appearance of circles
+            const circleIndices = [0, 1, 2, 3, 4];
+            circleIndices.forEach((index, idx) => {
+              setTimeout(() => {
+                setVisibleCircles((prev) => [...prev, index]);
+                // Show google reviews after last circle
+                if (index === 4) {
+                  setTimeout(() => {
+                    setShowGoogleReviews(true);
+                  }, 200); // 200ms delay after last circle
+                }
+              }, idx * 150); // 150ms delay between each circle
+            });
+          }
+        }, 35); // Faster: 30ms per character (was 45ms)
+      }
+    }, 35); // Faster: 20ms per character (was 35ms)
+
+    return () => {
+      clearInterval(typeInterval1);
+    };
   }, []);
 
   useEffect(() => {
@@ -138,9 +140,13 @@ function Home() {
   return (
     <>
       <div className="content-panel home-page" id="home">
-        <HomeHeroBanner />
+        <div className="homepage-head-banner">
+          <h1>
+            <div className="typing-container" id="typing1" dangerouslySetInnerHTML={{ __html: typing1Text }}></div>
+            <br />
+            <div className="typing-container" id="typing2">{typing2Text}</div>
+          </h1>
 
-        <div className="homepage-head-banner homepage-head-banner--circles">
           <div className="circle-container">
             <Link to="/about" className={`circle tooltip-btn ${visibleCircles.includes(0) ? 'zoom-in' : ''}`}>
               <span className="for-hover">
@@ -268,18 +274,7 @@ function Home() {
             </div>
 
             <h3>Careers Take Off with Top Airlines</h3>
-            <div className="list-of-airlines">
-              {airlines.map((airline, index) => (
-                <a
-                  key={index}
-                  href={airline.url}
-                                    rel="noopener noreferrer"
-                  className={`card tooltip-btn ${airline.name} ${airline.className || ''}`}
-                >
-                  <span className="tooltip-txt">{airline.url}</span>
-                </a>
-              ))}
-            </div>
+            <AirlinesList />
 
             <div className="text">
               At Kite Institute of Aviation & Hospitality, we believe that the sky is not the limit—it's just the beginning.

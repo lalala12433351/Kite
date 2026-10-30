@@ -1,10 +1,16 @@
 'use client';
 
+import type { CSSProperties } from 'react';
 import type { BlogBlock } from '@/lib/blogShared';
 
 function youtubeId(url: string) {
   const m = String(url || '').match(/(?:youtu\.be\/|v=|embed\/)([A-Za-z0-9_-]{6,})/);
   return m?.[1] || '';
+}
+
+function alignStyle(align?: BlogBlock['align']): CSSProperties {
+  if (!align || align === 'wide' || align === 'full') return {};
+  return { textAlign: align };
 }
 
 export default function BlogBlockRenderer({ blocks }: { blocks: BlogBlock[] }) {
@@ -14,23 +20,30 @@ export default function BlogBlockRenderer({ blocks }: { blocks: BlogBlock[] }) {
         const align = block.align || 'left';
         if (block.type === 'h1') {
           return (
-            <h1 key={block.id} className="blog-blocks__h1" style={{ textAlign: align }}>
+            <h1 key={block.id} className="blog-blocks__h1" style={alignStyle(align)}>
               {block.content}
             </h1>
           );
         }
         if (block.type === 'h2') {
           return (
-            <h2 key={block.id} className="blog-blocks__h2" style={{ textAlign: align }}>
+            <h2 key={block.id} className="blog-blocks__h2" style={alignStyle(align)}>
               {block.content}
             </h2>
           );
         }
         if (block.type === 'h3') {
           return (
-            <h3 key={block.id} className="blog-blocks__h3" style={{ textAlign: align }}>
+            <h3 key={block.id} className="blog-blocks__h3" style={alignStyle(align)}>
               {block.content}
             </h3>
+          );
+        }
+        if (block.type === 'h4') {
+          return (
+            <h4 key={block.id} className="blog-blocks__h4" style={alignStyle(align)}>
+              {block.content}
+            </h4>
           );
         }
         if (block.type === 'list') {
@@ -55,9 +68,17 @@ export default function BlogBlockRenderer({ blocks }: { blocks: BlogBlock[] }) {
         }
         if (block.type === 'image' && block.mediaUrl) {
           return (
-            <figure key={block.id} className="blog-blocks__figure" style={{ textAlign: align }}>
+            <figure key={block.id} className="blog-blocks__figure" style={alignStyle(align)}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={block.mediaUrl} alt={block.content || ''} />
+              {block.content ? <figcaption>{block.content}</figcaption> : null}
+            </figure>
+          );
+        }
+        if (block.type === 'video' && block.mediaUrl) {
+          return (
+            <figure key={block.id} className="blog-blocks__video" style={alignStyle(align)}>
+              <video src={block.mediaUrl} controls playsInline preload="metadata" />
               {block.content ? <figcaption>{block.content}</figcaption> : null}
             </figure>
           );
@@ -75,8 +96,20 @@ export default function BlogBlockRenderer({ blocks }: { blocks: BlogBlock[] }) {
             </div>
           );
         }
+        if (block.type === 'separator') {
+          return <hr key={block.id} className="blog-blocks__hr" />;
+        }
+        if (block.type === 'html') {
+          return (
+            <div
+              key={block.id}
+              className="blog-blocks__html"
+              dangerouslySetInnerHTML={{ __html: block.content || '' }}
+            />
+          );
+        }
         return (
-          <p key={block.id} className="blog-blocks__p" style={{ textAlign: align }}>
+          <p key={block.id} className="blog-blocks__p" style={alignStyle(align)}>
             {block.content}
           </p>
         );

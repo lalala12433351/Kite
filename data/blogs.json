@@ -45,11 +45,24 @@
     "authorName": "Kite Institute",
     "authorBio": "India’s trusted aviation & hospitality training institute in Bangalore.",
     "category": "Career Guidance",
-    "categories": ["Career Guidance"],
-    "tags": ["aviation career", "cabin crew", "airport jobs"],
+    "categories": [
+      "Career Guidance"
+    ],
+    "tags": [
+      "aviation career",
+      "cabin crew",
+      "airport jobs"
+    ],
     "isPinned": true,
     "focusKeyword": "aviation career",
-    "views": 128,
+    "ogTitle": "",
+    "ogDescription": "",
+    "ogImage": "",
+    "canonicalUrl": "",
+    "robotsIndex": true,
+    "robotsFollow": true,
+    "schemaType": "BlogPosting",
+    "views": 130,
     "likes": 14,
     "shares": 6,
     "comments": []

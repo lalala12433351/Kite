@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { dataDir } from '@/lib/content';
+import { atomicWriteJson } from '@/lib/safeJsonStore';
 import { CERTIFICATE_BATCHES, isKnownBatch } from '@/lib/certificateBatches';
 
 export type CertificateStatus = 'valid' | 'revoked' | 'expired';
@@ -88,7 +89,7 @@ export function readCertificates(): Certificate[] {
 
 export function writeCertificates(list: Certificate[]) {
   ensureFile();
-  fs.writeFileSync(FILE, `${JSON.stringify(list, null, 2)}\n`, 'utf8');
+  atomicWriteJson(FILE, Array.isArray(list) ? list : []);
   return list;
 }
 

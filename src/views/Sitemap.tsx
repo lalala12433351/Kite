@@ -4,8 +4,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from '@/lib/router';
 import { publicSitemapSections } from '../data/sitemapConfig';
 import { courses } from '../data/coursesData';
-import sampleNews from '../data/sampleNews';
-import { normalizeNewsItems } from '../utils/newsUtils';
 
 function Sitemap() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -16,19 +14,20 @@ function Sitemap() {
     path: `/courses/${course.id}`,
   }));
 
-  const [newsLinks, setNewsLinks] = useState(() =>
-    normalizeNewsItems(sampleNews).map((news) => ({
-      label: news.title,
-      path: `/news/${news.id}`,
-    }))
-  );
+  const [newsLinks, setNewsLinks] = useState<{ label: string; path: string }[]>([]);
 
   useEffect(() => {
-    fetch('/database/news-posts.json')
+    fetch('/api/news?scope=public')
       .then((response) => (response.ok ? response.json() : null))
       .then((data) => {
-        if (!Array.isArray(data) || !data.length) return;
-        setNewsLinks(data.map((news) => ({ label: news.title, path: `/news/${news.id}` })));
+        const posts = Array.isArray(data?.posts) ? data.posts : [];
+        if (!posts.length) return;
+        setNewsLinks(
+          posts.map((news: { title?: string; slug?: string }) => ({
+            label: news.title || 'News',
+            path: `/news/${news.slug}`,
+          })),
+        );
       })
       .catch(() => {});
   }, []);

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import UsefulLinksSection from '../components/UsefulLinksSection';
+import AirlinesList from '../components/AirlinesList';
 
 const getAssetUrl = (path) => `${'/'}${path}`;
 
@@ -101,38 +102,6 @@ function Placement() {
     { name: 'Shashank', company: 'The Elanza', image: 'images/placement-stories/shashank.png' },
   ];
 
-  const airlines = [
-    { name: 'airindia', url: 'https://www.airindia.com/' },
-    { name: 'emirates', url: 'https://www.emirates.com/ie/english/' },
-    { name: 'etihad', url: 'https://www.etihad.com/' },
-    { name: 'qatar', url: 'https://www.qatarairways.com/' },
-    { name: 'kuwait', url: 'https://www.kuwaitairways.com/en' },
-    { name: 'indigo', url: 'https://www.goindigo.in/' },
-    { name: 'spice', url: 'https://www.spicejet.com/' },
-    { name: 'airasia', url: 'https://www.airasia.com/' },
-    { name: 'akasaair', url: 'https://www.akasaair.com/' },
-    { name: 'starair', url: 'https://www.starair.in/' },
-    { name: 'vistara', url: 'https://www.airvistara.com/' },
-    { name: 'airindiaexpress', url: 'https://www.airindiaexpress.com/' },
-    { name: 'celebi', url: 'https://www.celebiaviation.com/' },
-    { name: 'airarabia', url: 'https://www.airarabia.com/' },
-    { name: 'american', url: 'https://www.aa.com/homePage.do?locale=en_US' },
-    { name: 'airindiasats', url: 'https://www.aisats.in/' },
-    { name: 'bwfs', url: 'https://www.bird.in/businessverticals/aviation-services.html' },
-    { name: 'gaar', url: 'https://www.gmrgroup.in/airports/' },
-    { name: 'itc', url: 'https://www.itcportal.com/' },
-    { name: 'harley', url: 'https://www.harley-davidson.com/', className: 'auto' },
-    { name: 'easymytrip', url: 'https://www.easemytrip.ae/', className: 'travel' },
-    { name: 'vfs', url: 'https://www.vfsglobal.com/en/individuals/index.html', className: 'travel' },
-    { name: 'parkhyat', url: 'https://www.hyatt.com/', className: 'hotel' },
-    { name: 'theleela', url: 'https://www.theleela.com/', className: 'hotel' },
-    { name: 'obroi', url: 'https://www.oberoihotels.com/', className: 'hotel' },
-    { name: 'taj', url: 'https://www.tajhotels.com/en-in', className: 'hotel' },
-    { name: 'jw', url: 'https://www.jw-marriott.marriott.com/', className: 'hotel' },
-    { name: 'radisson', url: 'https://www.radissonhotels.com/', className: 'hotel' },
-    { name: 'westin', url: 'https://www.westin.marriott.com/', className: 'hotel' }
-  ];
-
   return (
     <div className="content placement" id="placement">
       <div className="content-block">
@@ -228,19 +197,7 @@ function Placement() {
             <div className="text-box">
               <h3>Placement Partners</h3>
               <span>We are associated with some of the most prestigious names in the aviation and hospitality sectors, including:</span>
-              <div className="list-of-airlines">
-                {airlines.map((airline, index) => (
-                  <a
-                    key={index}
-                    href={airline.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`card tooltip-btn ${airline.name} ${airline.className || ''}`}
-                  >
-                    <span className="tooltip-txt">{airline.url}</span>
-                  </a>
-                ))}
-              </div>
+              <AirlinesList />
             </div>
           </div>
         </div>

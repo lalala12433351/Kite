@@ -9,6 +9,7 @@ import {
   type BlogPost,
   type BlogStatus,
 } from '@/lib/blogShared';
+import { assertNotEmptyOverwrite, atomicWriteJson, mergeById } from '@/lib/safeJsonStore';
 
 export * from '@/lib/blogShared';
 
@@ -102,6 +103,10 @@ function normalizePost(raw: Record<string, unknown>, index = 0): BlogPost {
           .filter(Boolean)
       : [];
 
+  const blocks = Array.isArray(raw.blocks)
+    ? (raw.blocks as BlogPost['blocks'])
+    : empty.blocks;
+
   return {
     ...empty,
     id: String(raw.id || `blog-${index + 1}`),
@@ -110,7 +115,8 @@ function normalizePost(raw: Record<string, unknown>, index = 0): BlogPost {
     metaTitle: String(raw.metaTitle || ''),
     metaDescription: String(raw.metaDescription || ''),
     coverImage: String(raw.coverImage || ''),
-    blocks: Array.isArray(raw.blocks) && raw.blocks.length ? (raw.blocks as BlogPost['blocks']) : empty.blocks,
+    // Keep an explicit empty blocks array; only fall back when blocks is missing
+    blocks: blocks.length ? blocks : Array.isArray(raw.blocks) ? blocks : empty.blocks,
     createdAt: String(raw.createdAt || empty.createdAt),
     isPublished: status === 'published',
     excerpt: String(raw.excerpt || ''),
@@ -123,11 +129,32 @@ function normalizePost(raw: Record<string, unknown>, index = 0): BlogPost {
     tags,
     isPinned: Boolean(raw.isPinned),
     focusKeyword: String(raw.focusKeyword || ''),
+    ogTitle: String(raw.ogTitle || ''),
+    ogDescription: String(raw.ogDescription || ''),
+    ogImage: String(raw.ogImage || ''),
+    canonicalUrl: String(raw.canonicalUrl || ''),
+    robotsIndex: raw.robotsIndex === undefined ? true : Boolean(raw.robotsIndex),
+    robotsFollow: raw.robotsFollow === undefined ? true : Boolean(raw.robotsFollow),
+    schemaType:
+      raw.schemaType === 'NewsArticle' || raw.schemaType === 'Article' || raw.schemaType === 'BlogPosting'
+        ? raw.schemaType
+        : 'BlogPosting',
     views: Number(raw.views || 0),
     likes: Number(raw.likes || 0),
     shares: Number(raw.shares || 0),
     comments: Array.isArray(raw.comments) ? (raw.comments as BlogPost['comments']) : [],
   };
+}
+
+function readExistingPosts(): BlogPost[] {
+  if (!fs.existsSync(FILE)) return [];
+  try {
+    const raw = JSON.parse(fs.readFileSync(FILE, 'utf8'));
+    if (!Array.isArray(raw)) return [];
+    return raw.map((item, index) => normalizePost(item, index));
+  } catch {
+    return [];
+  }
 }
 
 export function readBlogs(): BlogPost[] {
@@ -143,8 +170,40 @@ export function readBlogs(): BlogPost[] {
 
 export function writeBlogs(posts: BlogPost[]) {
   ensureFile();
-  const cleaned = (Array.isArray(posts) ? posts : []).map((item, index) => normalizePost(item, index));
-  fs.writeFileSync(FILE, `${JSON.stringify(cleaned, null, 2)}\n`, 'utf8');
+  const incoming = Array.isArray(posts) ? posts : [];
+  assertNotEmptyOverwrite(FILE, incoming.length, 'blog');
+
+  const existing = readExistingPosts();
+  const existingById = new Map(existing.map((p) => [p.id, p]));
+
+  // Merge each incoming post onto its stored version so omitted SEO/content
+  // fields cannot wipe previously saved data (views, comments, blocks, etc.).
+  const mergedIncoming = incoming.map((item, index) => {
+    const prev = existingById.get(String(item?.id || ''));
+    const combined = prev ? { ...prev, ...item, id: prev.id } : item;
+    // Never replace non-empty stored blocks with an accidental empty array
+    if (
+      prev &&
+      Array.isArray(prev.blocks) &&
+      prev.blocks.length > 0 &&
+      Array.isArray(item?.blocks) &&
+      item.blocks.length === 0
+    ) {
+      combined.blocks = prev.blocks;
+    }
+    // Preserve engagement counters if client sends zeros while server has values
+    // only when the client omitted them entirely (undefined), not intentional reset.
+    if (prev) {
+      if (item.views === undefined) combined.views = prev.views;
+      if (item.likes === undefined) combined.likes = prev.likes;
+      if (item.shares === undefined) combined.shares = prev.shares;
+      if (item.comments === undefined) combined.comments = prev.comments;
+    }
+    return normalizePost(combined as unknown as Record<string, unknown>, index);
+  });
+
+  const cleaned = mergeById(existing, mergedIncoming, { allowDelete: true });
+  atomicWriteJson(FILE, cleaned);
   return cleaned;
 }
 
