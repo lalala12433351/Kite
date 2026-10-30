@@ -4,3 +4,4 @@ node_modules
 .env.local
 public/tmp
 data/backups/
+data/form-submissions.json
