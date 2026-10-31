@@ -1,0 +1,13 @@
+[
+  {
+    "id": "hero-1",
+    "badge": "Kite Institute of Aviation & Hospitality",
+    "title": "India's Most Trusted\nAviation Training Institute",
+    "subtitle": "Bangalore’s leading aviation and hospitality institute — industry-focused training, placement support, and globally recognized certifications.",
+    "imageUrl": "/images/himg-1.jpg",
+    "btn1Text": "Explore Courses",
+    "btn1Url": "/courses",
+    "btn2Text": "About Kite",
+    "btn2Url": "/about"
+  }
+]

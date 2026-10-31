@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { saveFormLead } from '@/lib/formLeads';
 import { sendFormMail } from '@/lib/mail';
 
 const email = z.string().trim().email();
@@ -60,14 +61,23 @@ export async function POST(request, { params }) {
 
   try {
     const fields = schema.parse(await readFields(request));
+    saveFormLead(type, fields);
+
     const title = fields.formTitle || fields.jobTitle || fields.position || type;
     const lines = Object.entries(fields).filter(([, value]) => value != null && value !== '');
-    await sendFormMail({
-      subject: `${title} — ${fields.name || 'Website'}`,
-      replyTo: fields.email,
-      replyName: fields.name,
-      lines,
-    });
+    try {
+      await sendFormMail({
+        subject: `${title} — ${fields.name || 'Website'}`,
+        replyTo: fields.email,
+        replyName: fields.name,
+        lines,
+      });
+    } catch (error) {
+      const status = error.status || 500;
+      if (status !== 503) {
+        console.error('[forms] saved lead but email failed', error);
+      }
+    }
     return new Response('success', { headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
   } catch (error) {
     const status = error.status || 400;

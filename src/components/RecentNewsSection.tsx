@@ -2,22 +2,27 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from '@/lib/router';
-import sampleNews from '../data/sampleNews';
-import { normalizeNewsItems } from '../utils/newsUtils';
+import type { BlogPost } from '@/lib/blogShared';
 
-const getBaseUrl = () => '/';
-
-const truncateContent = (text, length = 140) => {
+const truncate = (text: string, length = 140) => {
   if (!text) return '';
   const normalized = text.replace(/<\/?[^>]+(>|$)/g, '').trim();
-  if (normalized.length <= length) {
-    return normalized;
-  }
+  if (normalized.length <= length) return normalized;
   return `${normalized.substring(0, length).trim()}…`;
 };
 
-function RecentNewsSection({ limit = 3, layout = 'full', title = 'Latest News', showViewAll = true }) {
-  const [newsItems, setNewsItems] = useState([]);
+function RecentNewsSection({
+  limit = 3,
+  layout = 'full',
+  title = 'Latest News',
+  showViewAll = true,
+}: {
+  limit?: number;
+  layout?: 'full' | 'embedded';
+  title?: string;
+  showViewAll?: boolean;
+}) {
+  const [newsItems, setNewsItems] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -28,43 +33,31 @@ function RecentNewsSection({ limit = 3, layout = 'full', title = 'Latest News', 
       setLoading(true);
       setError('');
       try {
-        const baseUrl = getBaseUrl();
-        const url = `${baseUrl}database/news-posts.json?timestamp=${Date.now()}`;
-        const response = await fetch(url, { signal: controller.signal });
-
-        if (!response.ok) {
-          throw new Error(`Request failed with status ${response.status}`);
-        }
-
+        const response = await fetch(`/api/news?scope=public&t=${Date.now()}`, {
+          signal: controller.signal,
+        });
+        if (!response.ok) throw new Error(`Request failed with status ${response.status}`);
         const data = await response.json();
-        const normalized = normalizeNewsItems(data);
-        setNewsItems(normalized.slice(0, limit));
+        const posts = Array.isArray(data.posts) ? data.posts : [];
+        setNewsItems(posts.slice(0, limit));
       } catch (err) {
-        if (err.name !== 'AbortError') {
-          setError('Unable to fetch latest news. Showing sample stories.');
+        if ((err as Error).name !== 'AbortError') {
+          setError('Unable to fetch latest news.');
         }
-        const fallback = normalizeNewsItems(sampleNews);
-        setNewsItems(fallback.slice(0, limit));
+        setNewsItems([]);
       } finally {
-        if (!controller.signal.aborted) {
-          setLoading(false);
-        }
+        if (!controller.signal.aborted) setLoading(false);
       }
     }
 
     fetchNews();
-
     return () => controller.abort();
   }, [limit]);
 
   const sectionClassName = useMemo(() => {
-    if (layout === 'embedded') {
-      return 'news-section news-section--embedded';
-    }
+    if (layout === 'embedded') return 'news-section news-section--embedded';
     return 'content-box news-section';
   }, [layout]);
-
-  const viewAllHref = '/news';
 
   return (
     <div className={sectionClassName}>
@@ -73,11 +66,11 @@ function RecentNewsSection({ limit = 3, layout = 'full', title = 'Latest News', 
           <span className="news-section__eyebrow">Updates & Highlights</span>
           <h2 className="news-section__title">{title}</h2>
         </div>
-        {showViewAll && (
-          <Link className="news-section__view-all" to={viewAllHref}>
+        {showViewAll ? (
+          <Link className="news-section__view-all" to="/news">
             View All News
           </Link>
-        )}
+        ) : null}
       </div>
 
       <div className="news-section__grid">
@@ -90,41 +83,33 @@ function RecentNewsSection({ limit = 3, layout = 'full', title = 'Latest News', 
                   <div className="skeleton-line skeleton-line--short" />
                   <div className="skeleton-line skeleton-line--medium" />
                   <div className="skeleton-line skeleton-line--long" />
-                  <div className="skeleton-line skeleton-line--medium" />
                 </div>
               </article>
             );
           }
 
-          let imageUrl = null;
-          if (item.image) {
-            imageUrl = /^https?:/i.test(item.image)
-              ? item.image
-              : `${getBaseUrl()}${item.image.replace(/^\/+/, '')}`;
-          }
+          const post = item as BlogPost;
+          const imageUrl = post.coverImage || '';
+          const excerpt = truncate(post.excerpt || post.metaDescription || '');
 
           return (
-            <article key={item.id} className="news-card">
-              <Link className="news-card__link" to={`/news/${item.id}`}>
-                {imageUrl && (
+            <article key={post.id} className="news-card">
+              <Link className="news-card__link" to={`/news/${post.slug}`}>
+                {imageUrl ? (
                   <div className="news-card__image">
-                    <img src={imageUrl} alt={item.title} loading="lazy" />
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={imageUrl} alt={post.title} loading="lazy" />
                   </div>
-                )}
+                ) : null}
                 <div className="news-card__body">
-                  <h3 className="news-card__title">{item.title}</h3>
-                  {(item.tag || item.created_at) && (
-                    <div className="news-card__meta">
-                      <time className="news-card__date" dateTime={item.created_at}>
-                        {item.formatted_date || item.created_at}
-                      </time>
-                      
-                    </div>
-                  )}
-                  <p className="news-card__excerpt">{truncateContent(item.content)}</p>
-                  <span className="news-card__read-more">
-                    Read Story
-                  </span>
+                  <h3 className="news-card__title">{post.title}</h3>
+                  <div className="news-card__meta">
+                    <time className="news-card__date" dateTime={post.createdAt}>
+                      {post.createdAt}
+                    </time>
+                  </div>
+                  {excerpt ? <p className="news-card__excerpt">{excerpt}</p> : null}
+                  <span className="news-card__read-more">Read Story</span>
                 </div>
               </Link>
             </article>
@@ -132,12 +117,9 @@ function RecentNewsSection({ limit = 3, layout = 'full', title = 'Latest News', 
         })}
       </div>
 
-      {!loading && error && (
-        <p className="news-section__fallback">{error}</p>
-      )}
+      {!loading && error ? <p className="news-section__fallback">{error}</p> : null}
     </div>
   );
 }
 
 export default RecentNewsSection;
-

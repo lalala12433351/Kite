@@ -1,11 +1,11 @@
 import { getPhpBackendUrl } from './phpBackendUrl';
 
 /**
- * Push a lead to TeleCRM via server-side telecrm-lead.php (token stays on server).
+ * Push a lead to TeleCRM via the server route (token stays on the server).
  * Failures are logged only — form submit UX is not blocked.
  */
 function getTelecrmLeadUrl() {
-  return getPhpBackendUrl('telecrm-lead.php');
+  return getPhpBackendUrl('api/telecrm');
 }
 
 export async function pushLeadToTelecrm(lead = {}) {
@@ -30,7 +30,7 @@ export async function pushLeadToTelecrm(lead = {}) {
         ? {
             ok: false,
             error:
-              'telecrm-lead.php was not reached (got the website page). On Node hosting, restart server.js after deploy; on Apache, ensure telecrm-lead.php is in dist/.',
+              'The TeleCRM route was not reached (got the website page instead of JSON).',
           }
         : { raw: text };
     }

@@ -344,8 +344,7 @@
     {
       "title": "Verify Certificate",
       "subtitle": "Verify student certificates online",
-      "href": "https://kiteaviation.in/students/verify",
-      "external": true,
+      "href": "/students/verify",
       "icon": "icons/certificate-check.svg"
     },
     {

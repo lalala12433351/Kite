@@ -8,6 +8,7 @@ import AviationCareersAdmin from './AviationCareersAdmin';
 import NewsAdmin from './NewsAdmin';
 import GalleryAdminHub from './GalleryAdminHub';
 import CmsSectionEditor from './cms/CmsSectionEditor';
+import CertificatesAdmin from './CertificatesAdmin';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
@@ -155,6 +156,7 @@ const contentModules = [
   { id: 'careers', label: 'Careers', group: 'Publishing', component: CareersAdmin },
   { id: 'aviation', label: 'Aviation Careers', group: 'Publishing', component: AviationCareersAdmin },
   { id: 'gallery', label: 'Gallery', group: 'Publishing', component: GalleryAdminHub },
+  { id: 'certificates', label: 'Certificates', group: 'Publishing', component: CertificatesAdmin },
 ];
 
 const modules = contentModules;
@@ -258,7 +260,9 @@ function AdminDashboard() {
         <div className="admin-login-page">
           <div className="admin-login-card">
             <h2>Kite Admin Portal</h2>
-            <p className="admin-login-sub">Sign in to manage SEO, page content, media, news, and careers.</p>
+            <p className="admin-login-sub">
+              Sign in to manage SEO, page content, media, news, careers, and certificates.
+            </p>
             <form onSubmit={handleLogin}>
               <label className="admin-label">Username</label>
               <input
@@ -292,7 +296,10 @@ function AdminDashboard() {
             <header className="unified-admin-header">
               <div>
                 <h1>Kite Content & SEO Admin</h1>
-                <p>Edit cover images, page copy, SEO metadata, and publishing modules. Changes save permanently.</p>
+                <p>
+                  Edit cover images, page copy, SEO metadata, publishing modules, and certificates. Changes
+                  save permanently.
+                </p>
               </div>
               <button onClick={handleLogout} className="admin-btn--logout-small">
                 Logout

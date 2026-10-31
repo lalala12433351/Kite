@@ -1,13 +1,15 @@
 'use client';
 
 import { Link, useLocation } from '@/lib/router';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useCmsContent, cmsAssetUrl } from '@/src/hooks/useCmsContent';
 import chromeFallback from '../../data/chrome.json';
 
 function Header() {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isStudentHubOpen, setIsStudentHubOpen] = useState(false);
+  const studentHubRef = useRef(null);
   const { data: chrome } = useCmsContent('chrome', chromeFallback);
   const nav = chrome?.nav?.length ? chrome.nav : chromeFallback.nav;
   const logo = chrome?.logo || chromeFallback.logo;
@@ -16,8 +18,19 @@ function Header() {
     if (path === '/news') {
       return location.pathname === '/news' || location.pathname.startsWith('/news/') ? 'active' : '';
     }
+    if (path === '/blog') {
+      return location.pathname === '/blog' || location.pathname.startsWith('/blog/') ? 'active' : '';
+    }
     return location.pathname === path ? 'active' : '';
   };
+
+  const isStudentHubActive =
+    location.pathname === '/student-hub' ||
+    location.pathname.startsWith('/students') ||
+    location.pathname.startsWith('/certificate') ||
+    location.pathname.startsWith('/virtual-classroom')
+      ? 'active'
+      : '';
 
   useEffect(() => {
     if (isMobileMenuOpen) {
@@ -31,9 +44,95 @@ function Header() {
     };
   }, [isMobileMenuOpen]);
 
+  useEffect(() => {
+    setIsStudentHubOpen(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    if (!isStudentHubOpen) return undefined;
+
+    const onPointerDown = (e) => {
+      if (studentHubRef.current && !studentHubRef.current.contains(e.target)) {
+        setIsStudentHubOpen(false);
+      }
+    };
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') setIsStudentHubOpen(false);
+    };
+
+    document.addEventListener('pointerdown', onPointerDown);
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown);
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [isStudentHubOpen]);
+
   const handleLinkClick = () => {
     setIsMobileMenuOpen(false);
+    setIsStudentHubOpen(false);
   };
+
+  const renderStudentHubDropdown = (item) => (
+    <div
+      key={item.href}
+      className={`nav-dropdown ${isStudentHubOpen ? 'is-open' : ''} ${isStudentHubActive}`}
+      ref={studentHubRef}
+    >
+      <button
+        type="button"
+        className="item nav-dropdown__trigger"
+        aria-expanded={isStudentHubOpen}
+        aria-haspopup="true"
+        onClick={() => setIsStudentHubOpen((open) => !open)}
+      >
+        <div className="text">
+          <div className="front">{item.label}</div>
+        </div>
+        <span className="nav-dropdown__caret" aria-hidden="true" />
+      </button>
+      <div className="nav-dropdown__menu" role="menu">
+        <Link
+          className={`nav-dropdown__item ${isActive('/student-hub')}`}
+          role="menuitem"
+          to="/student-hub"
+          onClick={handleLinkClick}
+        >
+          Overview
+        </Link>
+        <Link
+          className={`nav-dropdown__item ${location.pathname.startsWith('/students') || location.pathname.startsWith('/certificate') ? 'active' : ''}`}
+          role="menuitem"
+          to="/certificate"
+          onClick={handleLinkClick}
+        >
+          Certificate Verification
+        </Link>
+        <Link
+          className={`nav-dropdown__item ${location.pathname.startsWith('/virtual-classroom') ? 'active' : ''}`}
+          role="menuitem"
+          to="/virtual-classroom-login"
+          onClick={handleLinkClick}
+        >
+          Virtual Classroom
+        </Link>
+        <span className="nav-dropdown__item nav-dropdown__item--disabled" role="menuitem">
+          Flight Announcements
+          <span className="nav-dropdown__badge">Coming Soon</span>
+        </span>
+        <a
+          href="https://kiteaviation.in/quiz"
+          className="nav-dropdown__item"
+          target="_blank"
+          rel="noopener noreferrer"
+          role="menuitem"
+          onClick={handleLinkClick}
+        >
+          Aviation Quiz
+        </a>
+      </div>
+    </div>
+  );
 
   return (
     <>
@@ -55,18 +154,23 @@ function Header() {
         </Link>
 
         <div className="links">
-          {nav.map((item) => (
-            <Link
-              key={item.href}
-              to={item.href}
-              className={`item ${isActive(item.href)}`}
-              onClick={handleLinkClick}
-            >
-              <div className="text">
-                <div className="front">{item.label}</div>
-              </div>
-            </Link>
-          ))}
+          {nav.map((item) => {
+            if (item.href === '/student-hub') {
+              return renderStudentHubDropdown(item);
+            }
+            return (
+              <Link
+                key={item.href}
+                to={item.href}
+                className={`item ${isActive(item.href)}`}
+                onClick={handleLinkClick}
+              >
+                <div className="text">
+                  <div className="front">{item.label}</div>
+                </div>
+              </Link>
+            );
+          })}
         </div>
       </div>
     </>
