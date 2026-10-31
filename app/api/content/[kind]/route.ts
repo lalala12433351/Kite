@@ -1,6 +1,6 @@
-import { readContent } from '@/lib/content';
+import { ALL_CONTENT_KINDS, readContent } from '@/lib/content';
 
-const KINDS = new Set(['news', 'careers', 'aviation-careers', 'gallery-albums', 'gallery-images', 'gallery-settings']);
+const KINDS = new Set(ALL_CONTENT_KINDS);
 
 export async function GET(_request, { params }) {
   const { kind } = await params;

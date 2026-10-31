@@ -1,8 +1,8 @@
 import PageComponent from '@/src/views/Gallery';
-import { pageMeta } from '@/lib/pageMeta';
+import { resolvePageMetadata } from '@/lib/siteContent';
 
-export const metadata = pageMeta.gallery;
+export const metadata = resolvePageMetadata('gallery');
 
-export default function GalleryPage() {
+export default function Page() {
   return <PageComponent />;
 }

@@ -1,58 +1,26 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-
-const getAssetUrl = (path) => `${'/'}${path}`;
+import { useState, useEffect, useRef, useMemo } from 'react';
+import { useCmsContent, cmsAssetUrl } from '@/src/hooks/useCmsContent';
+import homeFallback from '../../data/home.json';
 
 function VideoGallery() {
-  const videos = [
-    {
-      id: 1,
-      thumbnail: getAssetUrl('icons/video-thumb1.jpg'),
-      videoSrc: getAssetUrl('gallery/walkthrough.mp4'),
-      subtitle: 'Kite Aviation',
-      title: 'Campus'
-    },
-    {
-      id: 2,
-      thumbnail: getAssetUrl('icons/video-thumb2.jpg'),
-      videoSrc: getAssetUrl('gallery/Koshy-Reel.mp4'),
-      subtitle: 'Kite Aviation',
-      title: 'Training'
-    },
-    {
-      id: 3,
-      thumbnail: getAssetUrl('icons/video-thumb3.jpg'),
-      videoSrc: getAssetUrl('gallery/speedramp.mp4'),
-      subtitle: 'Kite Aviation',
-      title: 'Promo Reel'
-    },
-    {
-      id: 4,
-      thumbnail: getAssetUrl('icons/video-thumb4.jpg'),
-      videoSrc: getAssetUrl('gallery/testimonial1.mp4'),
-      subtitle: 'Testimonial - Air India',
-      title: 'Anju'
-    },
-    {
-      id: 5,
-      thumbnail: getAssetUrl('icons/video-thumb5.jpg'),
-      videoSrc: getAssetUrl('gallery/Independenceday-video.mp4'),
-      subtitle: 'Independence Day',
-      title: 'Celebration'
-    },
-    {
-      id: 6,
-      thumbnail: getAssetUrl('icons/video-thumb6.jpg'),
-      videoSrc: getAssetUrl('gallery/kite-promo1.mp4'),
-      subtitle: 'Welcome to',
-      title: 'Kite'
-    }
-  ];
+  const { data: home } = useCmsContent('home', homeFallback);
+  const videos = useMemo(() => {
+    const source = home?.videos?.length ? home.videos : homeFallback.videos || [];
+    return source.map((video) => ({
+      id: video.id,
+      thumbnail: cmsAssetUrl(video.thumb || video.thumbnail),
+      videoSrc: cmsAssetUrl(video.src || video.videoSrc),
+      subtitle: video.subtitle,
+      title: video.title,
+    }));
+  }, [home]);
 
   const [playingVideo, setPlayingVideo] = useState(null);
   const centerVideoRef = useRef(null);
   const currentVideo = playingVideo ? videos.find((v) => v.id === playingVideo) : null;
+  const heading = home?.videoGalleryHeading || homeFallback.videoGalleryHeading || 'Media Showcase';
 
   useEffect(() => {
     if (!playingVideo || !centerVideoRef.current || !currentVideo) return;
@@ -86,7 +54,7 @@ function VideoGallery() {
           </div>
         </>
       )}
-      <h1>Media Showcase</h1>
+      <h1>{heading}</h1>
       <div className="video-testimonial">
         <div className="carousel">
           {videos.map((video) => (
@@ -105,4 +73,3 @@ function VideoGallery() {
 }
 
 export default VideoGallery;
-

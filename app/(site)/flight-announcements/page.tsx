@@ -1,8 +1,8 @@
 import PageComponent from '@/src/views/FlightAnnouncements';
-import { pageMeta } from '@/lib/pageMeta';
+import { resolvePageMetadata } from '@/lib/siteContent';
 
-export const metadata = pageMeta.flightAnnouncements;
+export const metadata = resolvePageMetadata('flightAnnouncements');
 
-export default function FlightAnnouncementsPage() {
+export default function Page() {
   return <PageComponent />;
 }

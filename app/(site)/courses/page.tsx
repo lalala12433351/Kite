@@ -1,8 +1,8 @@
 import PageComponent from '@/src/views/Courses';
-import { pageMeta } from '@/lib/pageMeta';
+import { resolvePageMetadata } from '@/lib/siteContent';
 
-export const metadata = pageMeta.courses;
+export const metadata = resolvePageMetadata('courses');
 
-export default function CoursesPage() {
+export default function Page() {
   return <PageComponent />;
 }

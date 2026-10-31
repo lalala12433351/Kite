@@ -1,8 +1,8 @@
 import PageComponent from '@/src/views/StudentHub';
-import { pageMeta } from '@/lib/pageMeta';
+import { resolvePageMetadata } from '@/lib/siteContent';
 
-export const metadata = pageMeta.studentHub;
+export const metadata = resolvePageMetadata('studentHub');
 
-export default function StudentHubPage() {
+export default function Page() {
   return <PageComponent />;
 }

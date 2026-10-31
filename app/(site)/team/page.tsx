@@ -1,8 +1,8 @@
 import PageComponent from '@/src/views/Team';
-import { pageMeta } from '@/lib/pageMeta';
+import { resolvePageMetadata } from '@/lib/siteContent';
 
-export const metadata = pageMeta.team;
+export const metadata = resolvePageMetadata('team');
 
-export default function TeamPage() {
+export default function Page() {
   return <PageComponent />;
 }

@@ -1,10 +1,11 @@
 import fs from 'fs';
 import path from 'path';
 import DOMPurify from 'isomorphic-dompurify';
+import { CMS_FILES, CMS_KINDS } from '@/lib/cmsKinds';
 
 export const dataDir = path.join(process.cwd(), 'data');
 
-const FILES = {
+const LEGACY_FILES = {
   news: 'news-posts.json',
   careers: 'careers-posts.json',
   'aviation-careers': 'aviation-careers-posts.json',
@@ -12,6 +13,14 @@ const FILES = {
   'gallery-images': 'gallery-images.json',
   'gallery-settings': 'gallery-settings.json',
 };
+
+const FILES = {
+  ...LEGACY_FILES,
+  ...CMS_FILES,
+};
+
+export const ALL_CONTENT_KINDS = Object.keys(FILES);
+export const CMS_KIND_SET = new Set(CMS_KINDS);
 
 export function sanitizeHtml(html) {
   return DOMPurify.sanitize(String(html || ''), { USE_PROFILES: { html: true } });
@@ -23,6 +32,9 @@ function emptyValue(kind) {
       description:
         'Every picture tells a story — of passion, progress, and possibilities. Browse through our gallery to relive the inspiring moments, cultural celebrations, and proud achievements that make Kite Institute a truly dynamic place to learn and grow.',
     };
+  }
+  if (CMS_KIND_SET.has(kind)) {
+    return {};
   }
   return [];
 }
@@ -51,11 +63,32 @@ export function writeContent(kind, data) {
   const file = contentFile(kind);
   if (!file) throw new Error('Unknown content type');
   fs.mkdirSync(path.dirname(file), { recursive: true });
-  const payload = Array.isArray(data)
-    ? data.map((post) => (post && typeof post.content === 'string' ? { ...post, content: sanitizeHtml(post.content) } : post))
-    : data;
+  let payload = data;
+  if (Array.isArray(data)) {
+    payload = data.map((post) =>
+      post && typeof post.content === 'string' ? { ...post, content: sanitizeHtml(post.content) } : post
+    );
+  }
   fs.writeFileSync(file, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
   return payload;
+}
+
+export function isCmsKind(kind) {
+  return CMS_KIND_SET.has(kind);
+}
+
+export function validateCmsPayload(kind, data) {
+  if (!isCmsKind(kind)) throw new Error('Unknown CMS kind');
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
+    throw new Error('CMS payload must be a JSON object');
+  }
+  if (kind === 'courses' && !Array.isArray(data.courses)) {
+    throw new Error('courses.json must include a courses array');
+  }
+  if (kind === 'site-seo' && (!data.defaults || !data.pages || typeof data.pages !== 'object')) {
+    throw new Error('site-seo.json must include defaults and pages');
+  }
+  return data;
 }
 
 function formatDisplayDate(iso) {

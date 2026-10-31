@@ -1,8 +1,8 @@
 import PageComponent from '@/src/views/KiteItDepartment';
-import { pageMeta } from '@/lib/pageMeta';
+import { resolvePageMetadata } from '@/lib/siteContent';
 
-export const metadata = pageMeta.itDepartment;
+export const metadata = resolvePageMetadata('itDepartment');
 
-export default function KiteItDepartmentPage() {
+export default function Page() {
   return <PageComponent />;
 }

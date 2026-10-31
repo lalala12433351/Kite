@@ -2,19 +2,36 @@
 
 import { useParams, Link } from '@/lib/router';
 import { useEffect, useRef, useState } from 'react';
-import { getCourseById } from '../data/coursesData';
+import { useMemo } from 'react';
+import { courses as fallbackCourses } from '../data/coursesData';
+import { useCmsContent, cmsAssetUrl } from '@/src/hooks/useCmsContent';
+import coursesDocFallback from '../../data/courses.json';
 import UsefulLinksSection from '../components/UsefulLinksSection';
 
-const getAssetUrl = (path) => `${'/'}${path}`;
+const getAssetUrl = (path) => cmsAssetUrl(path);
 
 const placementVideos = [
   { id: 'placement-1', thumbnail: getAssetUrl('icons/nilani.jpg'), videoSrc: getAssetUrl('gallery/placement-video2.webm'), title: 'Nilani', company: 'IndiGo', airlineLogo: 'indigo' },
   { id: 'placement-2', thumbnail: getAssetUrl('icons/pumin.jpg'), videoSrc: getAssetUrl('gallery/placement-video1.webm'), title: 'Pumin', company: 'Air India', airlineLogo: 'airindia' }
 ];
 
+function findCourseById(list, id) {
+  const numId = parseInt(id, 10);
+  if (!Number.isNaN(numId)) {
+    const found = list.find((c) => Number(c.id) === numId);
+    if (found) return found;
+  }
+  return list.find((c) => String(c.id) === String(id)) || null;
+}
+
 function CourseDetail() {
   const { id } = useParams();
-  const course = getCourseById(id);
+  const cmsFallback = coursesDocFallback?.courses?.length
+    ? coursesDocFallback
+    : { courses: fallbackCourses };
+  const { data: coursesDoc } = useCmsContent('courses', cmsFallback);
+  const courseList = coursesDoc?.courses?.length ? coursesDoc.courses : fallbackCourses;
+  const course = useMemo(() => findCourseById(courseList, id), [courseList, id]);
   const [playingPlacementVideo, setPlayingPlacementVideo] = useState(null);
   const centerPlacementVideoRef = useRef(null);
   const currentPlacementVideo = playingPlacementVideo ? placementVideos.find((v) => v.id === playingPlacementVideo) : null;
@@ -57,7 +74,7 @@ function CourseDetail() {
     );
   }
 
-  const imageUrl = getAssetUrl(course.image);
+  const imageUrl = cmsAssetUrl(course.image);
 
   return (
     <div className="content course-detail-page" id="course-detail">

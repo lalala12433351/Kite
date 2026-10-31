@@ -1,8 +1,8 @@
 import PageComponent from '@/src/views/NewsDetail';
-import { pageMeta } from '@/lib/pageMeta';
+import { resolvePageMetadata } from '@/lib/siteContent';
 
-export const metadata = pageMeta.newsDetail;
+export const metadata = resolvePageMetadata('newsDetail');
 
-export default function NewsDetailPage() {
+export default function Page() {
   return <PageComponent />;
 }

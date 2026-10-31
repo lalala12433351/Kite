@@ -1,7 +1,7 @@
 import PageComponent from '@/src/views/AdminDashboard';
-import { pageMeta } from '@/lib/pageMeta';
+import { resolvePageMetadata } from '@/lib/siteContent';
 
-export const metadata = pageMeta.admin;
+export const metadata = resolvePageMetadata('admin');
 
 export default function AdminDashboardPage() {
   return <PageComponent />;

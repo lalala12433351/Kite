@@ -1,8 +1,8 @@
 import PageComponent from '@/src/views/Contact';
-import { pageMeta } from '@/lib/pageMeta';
+import { resolvePageMetadata } from '@/lib/siteContent';
 
-export const metadata = pageMeta.contact;
+export const metadata = resolvePageMetadata('contact');
 
-export default function ContactPage() {
+export default function Page() {
   return <PageComponent />;
 }

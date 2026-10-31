@@ -1,70 +1,75 @@
 'use client';
 
 import { Link } from '@/lib/router';
+import { useCmsContent, cmsAssetUrl } from '@/src/hooks/useCmsContent';
+import homeFallback from '../../data/home.json';
 
-const getAssetUrl = (path) => `${'/'}${path}`;
+function dispatchLinkAction(action) {
+  if (action === 'openCampusTour') {
+    window.dispatchEvent(new CustomEvent('openCampusTour'));
+  } else if (action === 'openChatbot') {
+    window.dispatchEvent(new CustomEvent('openChatbot'));
+  }
+}
 
 function UsefulLinksSection() {
-  const openCampusTour = () => {
-    window.dispatchEvent(new CustomEvent('openCampusTour'));
-  };
-
-  const openVirtualAssistant = () => {
-    window.dispatchEvent(new CustomEvent('openChatbot'));
-  };
+  const { data: home } = useCmsContent('home', homeFallback);
+  const links = home?.usefulLinks?.length ? home.usefulLinks : homeFallback.usefulLinks || [];
 
   return (
     <div className="text-box useful-links-section">
       <h3>Useful Links</h3>
       <div className="useful-links-grid">
-        <a
-          href="https://kiteaviation.in/students/verify"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="cmall-link-card"
-        >
-          <span className="cmall-link-card__icon" aria-hidden>
-            <img src={getAssetUrl('icons/certificate-check.svg')} alt="" loading="lazy" />
-          </span>
-          <span className="cmall-link-card__text">
-            <strong>Verify Certificate</strong>
-            <small>Verify student certificates online</small>
-          </span>
-        </a>
+        {links.map((link) => {
+          const icon = cmsAssetUrl(link.icon);
+          const content = (
+            <>
+              <span className="cmall-link-card__icon" aria-hidden>
+                <img src={icon} alt="" loading="lazy" />
+              </span>
+              <span className="cmall-link-card__text">
+                <strong>{link.title}</strong>
+                <small>{link.subtitle}</small>
+              </span>
+            </>
+          );
 
-        <button type="button" onClick={openCampusTour} className="cmall-link-card">
-          <span className="cmall-link-card__icon" aria-hidden>
-            <img src={getAssetUrl('images/student-icon.svg')} alt="" loading="lazy" />
-          </span>
-          <span className="cmall-link-card__text">
-            <strong>Virtual Tour</strong>
-            <small>Explore our campus in 1 minute</small>
-          </span>
-        </button>
+          if (link.action) {
+            return (
+              <button
+                key={link.title}
+                type="button"
+                onClick={() => dispatchLinkAction(link.action)}
+                className="cmall-link-card"
+              >
+                {content}
+              </button>
+            );
+          }
 
-        <Link to="/student-hub" className="cmall-link-card showloader">
-          <span className="cmall-link-card__icon" aria-hidden>
-            <img src={getAssetUrl('images/play-icon.svg')} alt="" loading="lazy" />
-          </span>
-          <span className="cmall-link-card__text">
-            <strong>Student Hub</strong>
-            <small>Events, highlights &amp; activities</small>
-          </span>
-        </Link>
+          if (link.external) {
+            return (
+              <a
+                key={link.title}
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="cmall-link-card"
+              >
+                {content}
+              </a>
+            );
+          }
 
-        <button type="button" onClick={openVirtualAssistant} className="cmall-link-card">
-          <span className="cmall-link-card__icon" aria-hidden>
-            <img src={getAssetUrl('images/talk-icon.svg')} alt="" loading="lazy" />
-          </span>
-          <span className="cmall-link-card__text">
-            <strong>Virtual Assistant</strong>
-            <small>Get instant answers</small>
-          </span>
-        </button>
+          return (
+            <Link key={link.title} to={link.href || '/'} className="cmall-link-card showloader">
+              {content}
+            </Link>
+          );
+        })}
       </div>
     </div>
   );
 }
 
 export default UsefulLinksSection;
-

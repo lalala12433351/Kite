@@ -1,5 +1,6 @@
 /**
- * Shared course data for CourseSection and CourseDetail.
+ * Offline / first-paint fallback for course list and detail pages.
+ * Live content is loaded from CMS (`data/courses.json`) via `useCmsContent('courses')` in client views.
  * Image paths are relative; use getAssetUrl(course.image) in components.
  */
 export const courses = [

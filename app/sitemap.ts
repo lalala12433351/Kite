@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { courses } from '@/src/data/coursesData';
+import { getCoursesList } from '@/lib/siteContent';
 
 const BASE = process.env.NEXT_PUBLIC_SITE_URL || 'https://kiteaviation.in';
 
@@ -29,7 +29,7 @@ export default function sitemap() {
       url: `${BASE}${pathname === '/' ? '' : pathname}`,
       lastModified: now,
     })),
-    ...courses.map((course) => ({
+    ...getCoursesList().map((course) => ({
       url: `${BASE}/courses/${course.id}`,
       lastModified: now,
     })),

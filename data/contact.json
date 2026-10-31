@@ -1,0 +1,19 @@
+{
+  "hero": {
+    "title": "Contact Us",
+    "subtitle": "Get in touch with Kite and our admissions team will be happy to guide you through course details, eligibility, fees, and career opportunities in aviation.",
+    "ctaLabel": "Request a Callback",
+    "ctaEvent": {
+      "title": "Request a Callback",
+      "variant": "contact"
+    }
+  },
+  "useSiteSettingsFor": [
+    "phone",
+    "emails.enquiry",
+    "address",
+    "map",
+    "social"
+  ],
+  "addressHeading": "Our Address"
+}

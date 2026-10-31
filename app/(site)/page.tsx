@@ -1,7 +1,8 @@
 import PageComponent from '@/src/views/Home';
-import { pageMeta } from '@/lib/pageMeta';
+import { resolvePageMetadata } from '@/lib/siteContent';
 
-export const metadata = { ...pageMeta.home, title: { absolute: pageMeta.home.title } };
+const homeMeta = resolvePageMetadata('home');
+export const metadata = { ...homeMeta, title: { absolute: homeMeta.title } };
 
 export default function HomePage() {
   return <PageComponent />;

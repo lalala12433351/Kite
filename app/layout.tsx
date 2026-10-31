@@ -3,22 +3,30 @@ import { Suspense } from 'react';
 import GoogleTagManager from '@/src/components/GoogleTagManager';
 import ScrollToTop from '@/src/components/ScrollToTop';
 import { pageMeta } from '@/lib/pageMeta';
+import { getSeoDocument } from '@/lib/siteContent';
+
+const seoDefaults = getSeoDocument().defaults || {};
+const fallbackKeywords = [
+  'Aviation Institute',
+  'Hospitality Training',
+  'Cabin Crew Course',
+  'Airport Management',
+  'Aviation Courses',
+  'Bengaluru',
+];
+const keywordsFromCms =
+  typeof seoDefaults.keywords === 'string' && seoDefaults.keywords.trim()
+    ? seoDefaults.keywords.split(',').map((k) => k.trim()).filter(Boolean)
+    : null;
 
 export const metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://kiteaviation.in'),
   title: {
-    default: pageMeta.home.title,
+    default: seoDefaults.title || pageMeta.home.title,
     template: '%s | Kite Institute',
   },
-  description: pageMeta.home.description,
-  keywords: [
-    'Aviation Institute',
-    'Hospitality Training',
-    'Cabin Crew Course',
-    'Airport Management',
-    'Aviation Courses',
-    'Bengaluru',
-  ],
+  description: seoDefaults.description || pageMeta.home.description,
+  keywords: keywordsFromCms || fallbackKeywords,
   robots: { index: true, follow: true },
   icons: { icon: '/favicon.png' },
 };

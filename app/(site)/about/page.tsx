@@ -1,8 +1,8 @@
 import PageComponent from '@/src/views/About';
-import { pageMeta } from '@/lib/pageMeta';
+import { resolvePageMetadata } from '@/lib/siteContent';
 
-export const metadata = pageMeta.about;
+export const metadata = resolvePageMetadata('about');
 
-export default function AboutPage() {
+export default function Page() {
   return <PageComponent />;
 }

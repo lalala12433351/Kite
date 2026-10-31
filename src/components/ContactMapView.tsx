@@ -4,10 +4,11 @@ import { useEffect } from 'react';
 import { MapContainer, Marker, TileLayer, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { useCmsContent } from '@/src/hooks/useCmsContent';
+import siteSettingsFallback from '../../data/site-settings.json';
 
-const KITE_LAT = 12.92199144490488;
-const KITE_LNG = 77.63651978088221;
-const KITE_POSITION: [number, number] = [KITE_LAT, KITE_LNG];
+const DEFAULT_LAT = 12.92199144490488;
+const DEFAULT_LNG = 77.63651978088221;
 
 const kiteMarkerIcon = L.divIcon({
   className: 'map-leaflet-pin-host',
@@ -37,13 +38,13 @@ function getMarkerScreenX() {
     : MARKER_SCREEN_X_DESKTOP;
 }
 
-function MapViewSetup() {
+function MapViewSetup({ position }) {
   const map = useMap();
 
   useEffect(() => {
     const applyView = () => {
       map.invalidateSize();
-      map.setView(KITE_POSITION, map.getZoom() || 16, { animate: false });
+      map.setView(position, map.getZoom() || 16, { animate: false });
       const { x: width } = map.getSize();
       const offsetX = width * (getMarkerScreenX() - 0.5);
       map.panBy([-offsetX, 0], { animate: false });
@@ -62,15 +63,20 @@ function MapViewSetup() {
       map.off('resize', applyView);
       mq.removeEventListener('change', onBreakpointChange);
     };
-  }, [map]);
+  }, [map, position]);
 
   return null;
 }
 
 function ContactMapView() {
+  const { data: settings } = useCmsContent('site-settings', siteSettingsFallback);
+  const lat = Number(settings?.map?.lat ?? siteSettingsFallback.map.lat ?? DEFAULT_LAT);
+  const lng = Number(settings?.map?.lng ?? siteSettingsFallback.map.lng ?? DEFAULT_LNG);
+  const position: [number, number] = [lat, lng];
+
   return (
     <MapContainer
-      center={KITE_POSITION}
+      center={position}
       zoom={16}
       className="contact-map"
       scrollWheelZoom
@@ -82,8 +88,8 @@ function ContactMapView() {
         subdomains="abcd"
         maxZoom={20}
       />
-      <MapViewSetup />
-      <Marker position={KITE_POSITION} icon={kiteMarkerIcon} />
+      <MapViewSetup position={position} />
+      <Marker position={position} icon={kiteMarkerIcon} />
     </MapContainer>
   );
 }

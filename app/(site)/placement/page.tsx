@@ -1,8 +1,8 @@
 import PageComponent from '@/src/views/Placement';
-import { pageMeta } from '@/lib/pageMeta';
+import { resolvePageMetadata } from '@/lib/siteContent';
 
-export const metadata = pageMeta.placement;
+export const metadata = resolvePageMetadata('placement');
 
-export default function PlacementPage() {
+export default function Page() {
   return <PageComponent />;
 }

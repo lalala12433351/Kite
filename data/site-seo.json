@@ -1,0 +1,136 @@
+{
+  "defaults": {
+    "title": "Kite Institute of Aviation & Hospitality | Aviation & Hospitality Training",
+    "description": "Kite Institute of Aviation & Hospitality offers top-notch training in aviation, hospitality, and travel management. Start your dream career today!",
+    "keywords": "Aviation Institute, Hospitality Training, Cabin Crew Course, Airport Management, Aviation Courses, Bengaluru",
+    "ogImage": ""
+  },
+  "pages": {
+    "home": {
+      "title": "Kite Institute of Aviation & Hospitality | Aviation & Hospitality Training",
+      "description": "Kite Institute of Aviation & Hospitality offers top-notch training in aviation, hospitality, and travel management. Start your dream career today!",
+      "ogTitle": "",
+      "ogDescription": "",
+      "ogImage": ""
+    },
+    "about": {
+      "title": "About Kite",
+      "description": "India’s aviation and hospitality training institute in Koramangala, Bengaluru.",
+      "ogTitle": "",
+      "ogDescription": "",
+      "ogImage": ""
+    },
+    "courses": {
+      "title": "Courses",
+      "description": "Diploma, ground services, ramp, airport operations, travel, and cargo courses at Kite.",
+      "ogTitle": "",
+      "ogDescription": "",
+      "ogImage": ""
+    },
+    "course": {
+      "title": "Course",
+      "description": "Course details, eligibility, and curriculum at Kite Institute of Aviation & Hospitality.",
+      "ogTitle": "",
+      "ogDescription": "",
+      "ogImage": ""
+    },
+    "placement": {
+      "title": "Placement",
+      "description": "Placement stories and hiring partners of Kite Institute of Aviation & Hospitality.",
+      "ogTitle": "",
+      "ogDescription": "",
+      "ogImage": ""
+    },
+    "team": {
+      "title": "Our Team",
+      "description": "Faculty and leadership at Kite Institute of Aviation & Hospitality.",
+      "ogTitle": "",
+      "ogDescription": "",
+      "ogImage": ""
+    },
+    "gallery": {
+      "title": "Media Gallery",
+      "description": "Campus, events, and celebrations at Kite Institute of Aviation & Hospitality.",
+      "ogTitle": "",
+      "ogDescription": "",
+      "ogImage": ""
+    },
+    "news": {
+      "title": "News & Updates",
+      "description": "Aviation and institute news from Kite Institute of Aviation & Hospitality.",
+      "ogTitle": "",
+      "ogDescription": "",
+      "ogImage": ""
+    },
+    "newsDetail": {
+      "title": "News",
+      "description": "News article from Kite Institute of Aviation & Hospitality.",
+      "ogTitle": "",
+      "ogDescription": "",
+      "ogImage": ""
+    },
+    "studentHub": {
+      "title": "Student Hub",
+      "description": "Quizzes, virtual classroom, and student tools at Kite.",
+      "ogTitle": "",
+      "ogDescription": "",
+      "ogImage": ""
+    },
+    "flightAnnouncements": {
+      "title": "Flight Announcements",
+      "description": "Practice cabin-crew announcement scripts at Kite.",
+      "ogTitle": "",
+      "ogDescription": "",
+      "ogImage": ""
+    },
+    "virtualClassroomLogin": {
+      "title": "Virtual Classroom",
+      "description": "Preview recorded classroom sessions at Kite.",
+      "ogTitle": "",
+      "ogDescription": "",
+      "ogImage": ""
+    },
+    "virtualClassroom": {
+      "title": "Virtual Classroom",
+      "description": "Sample recorded sessions from Kite Institute.",
+      "ogTitle": "",
+      "ogDescription": "",
+      "ogImage": ""
+    },
+    "careers": {
+      "title": "Careers",
+      "description": "Jobs at Kite Institute of Aviation & Hospitality.",
+      "ogTitle": "",
+      "ogDescription": "",
+      "ogImage": ""
+    },
+    "aviationCareers": {
+      "title": "Aviation Careers",
+      "description": "Airline and airport job posts shared by Kite.",
+      "ogTitle": "",
+      "ogDescription": "",
+      "ogImage": ""
+    },
+    "contact": {
+      "title": "Contact",
+      "description": "Address, phone, and enquiry form for Kite Institute in Koramangala, Bengaluru.",
+      "ogTitle": "",
+      "ogDescription": "",
+      "ogImage": ""
+    },
+    "sitemap": {
+      "title": "Sitemap",
+      "description": "All pages on the Kite Institute website.",
+      "ogTitle": "",
+      "ogDescription": "",
+      "ogImage": ""
+    },
+    "itDepartment": {
+      "title": "IT Department",
+      "description": "Kite Institute IT department services.",
+      "ogTitle": "",
+      "ogDescription": "",
+      "ogImage": ""
+    }
+  }
+}

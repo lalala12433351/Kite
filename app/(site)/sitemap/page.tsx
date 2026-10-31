@@ -1,8 +1,8 @@
 import PageComponent from '@/src/views/Sitemap';
-import { pageMeta } from '@/lib/pageMeta';
+import { resolvePageMetadata } from '@/lib/siteContent';
 
-export const metadata = pageMeta.sitemap;
+export const metadata = resolvePageMetadata('sitemap');
 
-export default function SitemapPagePage() {
+export default function Page() {
   return <PageComponent />;
 }

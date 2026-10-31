@@ -1,8 +1,8 @@
 import PageComponent from '@/src/views/VirtualClassroomLogin';
-import { pageMeta } from '@/lib/pageMeta';
+import { resolvePageMetadata } from '@/lib/siteContent';
 
-export const metadata = pageMeta.virtualClassroomLogin;
+export const metadata = resolvePageMetadata('virtualClassroomLogin');
 
-export default function VirtualClassroomLoginPage() {
+export default function Page() {
   return <PageComponent />;
 }
