@@ -1,16 +1,11 @@
 'use client';
 
 import { Link } from '@/lib/router';
-import { useCmsContent, cmsAssetUrl } from '@/src/hooks/useCmsContent';
-import homeFallback from '../../data/home.json';
 import featuredPlacementStudents from '../data/featuredPlacementStudents';
 
-function StudentSuccessStoriesSection() {
-  const { data: home } = useCmsContent('home', homeFallback);
-  const students = home?.featuredPlacementStudents?.length
-    ? home.featuredPlacementStudents
-    : featuredPlacementStudents;
+const getAssetUrl = (path) => `${'/'}${path}`;
 
+function StudentSuccessStoriesSection() {
   return (
     <section className="content-box student-success-stories" aria-labelledby="student-success-stories-title">
       <div className="content-block">
@@ -23,11 +18,11 @@ function StudentSuccessStoriesSection() {
         </p>
 
         <ul className="student-success-stories__grid">
-          {students.map((student) => (
+          {featuredPlacementStudents.map((student) => (
             <li key={student.name} className="student-success-stories__card">
               <div className="student-success-stories__photo">
                 <img
-                  src={cmsAssetUrl(student.image)}
+                  src={getAssetUrl(student.image)}
                   alt={`${student.name} placed at ${student.company}`}
                   loading="lazy"
                 />

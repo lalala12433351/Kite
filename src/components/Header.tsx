@@ -2,22 +2,17 @@
 
 import { Link, useLocation } from '@/lib/router';
 import { useState, useEffect, useRef } from 'react';
-import { useCmsContent, cmsAssetUrl } from '@/src/hooks/useCmsContent';
-import chromeFallback from '../../data/chrome.json';
+
+// Get base URL for assets
+const getAssetUrl = (path) => `${'/'}${path}`;
 
 function Header() {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isStudentHubOpen, setIsStudentHubOpen] = useState(false);
   const studentHubRef = useRef(null);
-  const { data: chrome } = useCmsContent('chrome', chromeFallback);
-  const nav = chrome?.nav?.length ? chrome.nav : chromeFallback.nav;
-  const logo = chrome?.logo || chromeFallback.logo;
 
   const isActive = (path) => {
-    if (path === '/news') {
-      return location.pathname === '/news' || location.pathname.startsWith('/news/') ? 'active' : '';
-    }
     if (path === '/blog') {
       return location.pathname === '/blog' || location.pathname.startsWith('/blog/') ? 'active' : '';
     }
@@ -32,6 +27,7 @@ function Header() {
       ? 'active'
       : '';
 
+  // Handle mobile menu toggle - add/remove class to body
   useEffect(() => {
     if (isMobileMenuOpen) {
       document.body.classList.add('menu-opened');
@@ -44,6 +40,7 @@ function Header() {
     };
   }, [isMobileMenuOpen]);
 
+  // Close Student Hub dropdown on outside click / Escape / route change
   useEffect(() => {
     setIsStudentHubOpen(false);
   }, [location.pathname]);
@@ -68,71 +65,11 @@ function Header() {
     };
   }, [isStudentHubOpen]);
 
+  // Close menu when clicking on a link
   const handleLinkClick = () => {
     setIsMobileMenuOpen(false);
     setIsStudentHubOpen(false);
   };
-
-  const renderStudentHubDropdown = (item) => (
-    <div
-      key={item.href}
-      className={`nav-dropdown ${isStudentHubOpen ? 'is-open' : ''} ${isStudentHubActive}`}
-      ref={studentHubRef}
-    >
-      <button
-        type="button"
-        className="item nav-dropdown__trigger"
-        aria-expanded={isStudentHubOpen}
-        aria-haspopup="true"
-        onClick={() => setIsStudentHubOpen((open) => !open)}
-      >
-        <div className="text">
-          <div className="front">{item.label}</div>
-        </div>
-        <span className="nav-dropdown__caret" aria-hidden="true" />
-      </button>
-      <div className="nav-dropdown__menu" role="menu">
-        <Link
-          className={`nav-dropdown__item ${isActive('/student-hub')}`}
-          role="menuitem"
-          to="/student-hub"
-          onClick={handleLinkClick}
-        >
-          Overview
-        </Link>
-        <Link
-          className={`nav-dropdown__item ${location.pathname.startsWith('/students') || location.pathname.startsWith('/certificate') ? 'active' : ''}`}
-          role="menuitem"
-          to="/certificate"
-          onClick={handleLinkClick}
-        >
-          Certificate Verification
-        </Link>
-        <Link
-          className={`nav-dropdown__item ${location.pathname.startsWith('/virtual-classroom') ? 'active' : ''}`}
-          role="menuitem"
-          to="/virtual-classroom-login"
-          onClick={handleLinkClick}
-        >
-          Virtual Classroom
-        </Link>
-        <span className="nav-dropdown__item nav-dropdown__item--disabled" role="menuitem">
-          Flight Announcements
-          <span className="nav-dropdown__badge">Coming Soon</span>
-        </span>
-        <a
-          href="https://kiteaviation.in/quiz"
-          className="nav-dropdown__item"
-          target="_blank"
-          rel="noopener noreferrer"
-          role="menuitem"
-          onClick={handleLinkClick}
-        >
-          Aviation Quiz
-        </a>
-      </div>
-    </div>
-  );
 
   return (
     <>
@@ -147,30 +84,118 @@ function Header() {
           <path d="M0 1h22M0 8h22M0 15h22" stroke="currentColor" strokeWidth="2" />
         </svg>
       </button>
-
+      
       <div className="nav-menu">
         <Link to="/" className="app-logo">
-          <img src={cmsAssetUrl(logo.src)} alt={logo.alt || 'Kite Institute of Aviation & Hospitality'} />
+          <img src={getAssetUrl("icons/logo-lt.svg")} alt="Kite Institute of Aviation & Hospitality"/>
         </Link>
-
+        
         <div className="links">
-          {nav.map((item) => {
-            if (item.href === '/student-hub') {
-              return renderStudentHubDropdown(item);
-            }
-            return (
+          <Link to="/about" className={`item ${isActive('/about')}`} onClick={handleLinkClick}>
+            <div className="text">
+              <div className="front">About Kite</div>
+            </div>
+          </Link>
+          
+          <Link to="/courses" className={`item ${isActive('/courses')}`} onClick={handleLinkClick}>
+            <div className="text">
+              <div className="front">Courses</div>
+            </div>
+          </Link>
+          
+          <Link to="/placement" className={`item ${isActive('/placement')}`} onClick={handleLinkClick}>
+            <div className="text">
+              <div className="front">Placement</div>
+            </div>
+          </Link>
+          
+          <Link to="/blog" className={`item ${isActive('/blog')}`} onClick={handleLinkClick}>
+            <div className="text">
+              <div className="front">Blog</div>
+            </div>
+          </Link>
+          
+          <Link to="/gallery" className={`item ${isActive('/gallery')}`} onClick={handleLinkClick}>
+            <div className="text">
+              <div className="front">Media Gallery</div>
+            </div>
+          </Link>
+
+          <div
+            className={`nav-dropdown ${isStudentHubOpen ? 'is-open' : ''} ${isStudentHubActive}`}
+            ref={studentHubRef}
+          >
+            <button
+              type="button"
+              className="item nav-dropdown__trigger"
+              aria-expanded={isStudentHubOpen}
+              aria-haspopup="true"
+              onClick={() => setIsStudentHubOpen((open) => !open)}
+            >
+              <div className="text">
+                <div className="front">Student Hub</div>
+              </div>
+              <span className="nav-dropdown__caret" aria-hidden="true" />
+            </button>
+            <div className="nav-dropdown__menu" role="menu">
               <Link
-                key={item.href}
-                to={item.href}
-                className={`item ${isActive(item.href)}`}
+                className={`nav-dropdown__item ${isActive('/student-hub')}`}
+                role="menuitem"
+                to="/student-hub"
                 onClick={handleLinkClick}
               >
-                <div className="text">
-                  <div className="front">{item.label}</div>
-                </div>
+                Overview
               </Link>
-            );
-          })}
+              <Link
+                className={`nav-dropdown__item ${location.pathname.startsWith('/students') || location.pathname.startsWith('/certificate') ? 'active' : ''}`}
+                role="menuitem"
+                to="/certificate"
+                onClick={handleLinkClick}
+              >
+                Certificate Verification
+              </Link>
+              <Link
+                className={`nav-dropdown__item ${location.pathname.startsWith('/virtual-classroom') ? 'active' : ''}`}
+                role="menuitem"
+                to="/virtual-classroom-login"
+                onClick={handleLinkClick}
+              >
+                Virtual Classroom
+              </Link>
+              <span className="nav-dropdown__item nav-dropdown__item--disabled" role="menuitem">
+                Flight Announcements
+                <span className="nav-dropdown__badge">Coming Soon</span>
+              </span>
+              <a
+                href="https://kiteaviation.in/quiz"
+                className="nav-dropdown__item"
+                target="_blank"
+                rel="noopener noreferrer"
+                role="menuitem"
+                onClick={handleLinkClick}
+              >
+                Aviation Quiz
+              </a>
+            </div>
+          </div>
+
+          <Link to="/team" className={`item ${isActive('/team')}`} onClick={handleLinkClick}>
+            <div className="text">
+              <div className="front">Our Team</div>
+            </div>
+          </Link>
+
+          <Link to="/careers" className={`item ${isActive('/careers')}`} onClick={handleLinkClick}>
+            <div className="text">
+              <div className="front">Careers</div>
+            </div>
+          </Link>
+          
+          <Link to="/contact" className={`item ${isActive('/contact')}`} onClick={handleLinkClick}>
+            <div className="text">
+              <div className="front">Contact</div>
+            </div>
+          </Link>
         </div>
       </div>
     </>

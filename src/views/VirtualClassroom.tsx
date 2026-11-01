@@ -1,31 +1,13 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from '@/lib/router';
-import { useCmsContent, cmsAssetUrl } from '@/src/hooks/useCmsContent';
-import virtualClassroomFallback from '../../data/virtual-classroom.json';
+
+// Get base URL for assets
+const getAssetUrl = (path) => `${'/'}${path}`;
 
 function VirtualClassroom() {
   const navigate = useNavigate();
-  const { data: vcDoc } = useCmsContent('virtual-classroom', virtualClassroomFallback);
-  const page = vcDoc?.page || virtualClassroomFallback.page;
-  const sidebar = vcDoc?.sidebar || virtualClassroomFallback.sidebar;
-  const sessions = useMemo(() => {
-    const source = vcDoc?.sessions?.length ? vcDoc.sessions : virtualClassroomFallback.sessions;
-    return source.map((session) => ({
-      ...session,
-      thumbnail: cmsAssetUrl(session.thumbnail),
-    }));
-  }, [vcDoc?.sessions]);
-  const downloadableResources =
-    vcDoc?.downloadableResources?.length
-      ? vcDoc.downloadableResources
-      : virtualClassroomFallback.downloadableResources;
-  const discussionComments =
-    vcDoc?.discussionComments?.length
-      ? vcDoc.discussionComments
-      : virtualClassroomFallback.discussionComments;
-  const categories = page.categories || virtualClassroomFallback.page.categories;
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [studentId, setStudentId] = useState('');
 
@@ -46,24 +28,132 @@ function VirtualClassroom() {
     navigate('/virtual-classroom-login');
   };
 
+  // Sample recorded sessions - replace with actual data
+  const sessions = [
+    {
+      id: 1,
+      title: 'Introduction to Aviation Industry',
+      description: 'Get an overview of the aviation sector, its history, and current trends shaping the industry.',
+      duration: '45 minutes',
+      category: 'Foundation',
+      thumbnail: getAssetUrl('images/camp-bg.jpg'),
+      videoUrl: '#',
+      instructor: 'Capt. Rajesh Kumar',
+      date: '2024-01-15'
+    },
+    {
+      id: 2,
+      title: 'Cabin Crew Duties & Responsibilities',
+      description: 'Learn about the essential duties of cabin crew members and how to excel in customer service.',
+      duration: '1 hour 15 minutes',
+      category: 'Cabin Crew',
+      thumbnail: getAssetUrl('images/camp-bg.jpg'),
+      videoUrl: '#',
+      instructor: 'Ms. Priya Sharma',
+      date: '2024-01-18'
+    },
+    {
+      id: 3,
+      title: 'Airport Operations Basics',
+      description: 'Understand the fundamentals of airport operations, from check-in to boarding gates.',
+      duration: '50 minutes',
+      category: 'Operations',
+      thumbnail: getAssetUrl('images/camp-bg.jpg'),
+      videoUrl: '#',
+      instructor: 'Mr. Amit Verma',
+      date: '2024-01-20'
+    },
+    {
+      id: 4,
+      title: 'Customer Service Excellence',
+      description: 'Master the art of delivering exceptional customer service in aviation and hospitality.',
+      duration: '1 hour',
+      category: 'Hospitality',
+      thumbnail: getAssetUrl('images/camp-bg.jpg'),
+      videoUrl: '#',
+      instructor: 'Ms. Sunita Reddy',
+      date: '2024-01-22'
+    },
+    {
+      id: 5,
+      title: 'Safety & Emergency Procedures',
+      description: 'Critical safety protocols and emergency procedures every aviation professional must know.',
+      duration: '1 hour 30 minutes',
+      category: 'Safety',
+      thumbnail: getAssetUrl('images/camp-bg.jpg'),
+      videoUrl: '#',
+      instructor: 'Capt. Vikram Singh',
+      date: '2024-01-25'
+    },
+    {
+      id: 6,
+      title: 'Aviation Terminology & Communication',
+      description: 'Build your aviation vocabulary and improve your professional communication skills.',
+      duration: '40 minutes',
+      category: 'Foundation',
+      thumbnail: getAssetUrl('images/camp-bg.jpg'),
+      videoUrl: '#',
+      instructor: 'Ms. Anjali Patel',
+      date: '2024-01-28'
+    },
+    {
+      id: 7,
+      title: 'Hospitality Management Principles',
+      description: 'Explore core principles of hospitality management and guest relations.',
+      duration: '55 minutes',
+      category: 'Hospitality',
+      thumbnail: getAssetUrl('images/camp-bg.jpg'),
+      videoUrl: '#',
+      instructor: 'Ms. Kavita Mehta',
+      date: '2024-02-01'
+    },
+    {
+      id: 8,
+      title: 'Interview Preparation Workshop',
+      description: 'Prepare for airline and hospitality job interviews with expert tips and mock sessions.',
+      duration: '1 hour 20 minutes',
+      category: 'Career',
+      thumbnail: getAssetUrl('images/camp-bg.jpg'),
+      videoUrl: '#',
+      instructor: 'Ms. Deepika Rao',
+      date: '2024-02-05'
+    }
+  ];
+
+  const categories = ['All', 'Foundation', 'Cabin Crew', 'Operations', 'Hospitality', 'Safety', 'Career'];
   const filteredSessions = selectedCategory === 'All' 
     ? sessions 
     : sessions.filter(session => session.category === selectedCategory);
+
+  // Sample downloadable resources
+  const downloadableResources = [
+    { id: 1, name: 'Aviation Industry Guide.pdf', size: '2.5 MB', type: 'PDF' },
+    { id: 2, name: 'Cabin Crew Handbook.pdf', size: '1.8 MB', type: 'PDF' },
+    { id: 3, name: 'Safety Procedures Checklist.pdf', size: '950 KB', type: 'PDF' },
+    { id: 4, name: 'Interview Tips & Templates.docx', size: '1.2 MB', type: 'DOC' },
+  ];
+
+  // Sample discussion comments
+  const discussionComments = [
+    { id: 1, author: 'Student A', comment: 'This session was very helpful! Thank you.', time: '2 hours ago' },
+    { id: 2, author: 'Student B', comment: 'Could you explain more about emergency protocols?', time: '1 day ago' },
+    { id: 3, author: 'Instructor', comment: 'Great question! I\'ll cover that in the next session.', time: '2 days ago' },
+  ];
 
   return (
     <div className="content-box virtual-classroom-page">
       <div className="virtual-classroom-topbar">
         <div className="topbar-content">
           <div className="topbar-left">
-            <span className="topbar-welcome">{page.welcomePrefix}</span>
+            <span className="topbar-welcome">Welcome back,</span>
             <span className="topbar-student-id">{studentId}</span>
           </div>
           <div className="topbar-right">
             <button className="topbar-btn" onClick={() => alert('Profile settings coming soon!')}>
-              {page.profileButtonLabel}
+              Profile
             </button>
             <button className="topbar-btn" onClick={handleLogout}>
-              {page.logoutButtonLabel}
+              Logout
             </button>
           </div>
         </div>
@@ -71,7 +161,7 @@ function VirtualClassroom() {
       <div className="content-block virtual-classroom-layout">
         <div className="virtual-classroom-main">
           <div className="virtual-classroom-intro">
-            <h1>{page.title}</h1>
+            <h1>Virtual Classroom</h1>
           </div>
 
           <div className="filter-tabs">
@@ -105,9 +195,9 @@ function VirtualClassroom() {
                   </div>
                   <div className="session-actions">
                     <button className="watch-btn" onClick={() => {
-                      alert(page.watchPlaceholderMessage);
+                      alert('Video player coming soon. This will play the recorded session.');
                     }}>
-                      {page.watchButtonLabel}
+                      Watch Now
                     </button>
                   </div>
                 </div>
@@ -117,20 +207,20 @@ function VirtualClassroom() {
 
           {filteredSessions.length === 0 && (
             <div className="no-sessions">
-              <p>{page.emptyCategoryMessage}</p>
+              <p>No sessions found in this category.</p>
             </div>
           )}
 
           <div className="training-tip">
             <p>
-              <strong>Tip:</strong> {page.trainingTip}
+              <strong>Tip:</strong> Bookmark your favorite sessions for quick access and revisit anytime!
             </p>
           </div>
         </div>
 
         <div className="virtual-classroom-sidebar">
           <div className="sidebar-section">
-            <h3 className="sidebar-title">{sidebar.discussionTitle}</h3>
+            <h3 className="sidebar-title">Discussion Forum</h3>
             <div className="discussion-list">
               {discussionComments.map(comment => (
                 <div key={comment.id} className="discussion-item">
@@ -142,19 +232,19 @@ function VirtualClassroom() {
                 </div>
               ))}
             </div>
-            <button className="sidebar-btn">{sidebar.viewCommentsLabel}</button>
+            <button className="sidebar-btn">View All Comments</button>
             <div className="comment-form">
               <textarea 
                 className="comment-input" 
-                placeholder={sidebar.commentPlaceholder}
+                placeholder="Add your comment..."
                 rows={3}
               ></textarea>
-              <button className="comment-submit-btn">{sidebar.postCommentLabel}</button>
+              <button className="comment-submit-btn">Post Comment</button>
             </div>
           </div>
 
           <div className="sidebar-section">
-            <h3 className="sidebar-title">{sidebar.resourcesTitle}</h3>
+            <h3 className="sidebar-title">Downloadable Resources</h3>
             <div className="resources-list">
               {downloadableResources.map(resource => (
                 <div key={resource.id} className="resource-item">
@@ -169,15 +259,16 @@ function VirtualClassroom() {
                 </div>
               ))}
             </div>
-            <button className="sidebar-btn">{sidebar.viewResourcesLabel}</button>
+            <button className="sidebar-btn">View All Resources</button>
           </div>
 
           <div className="sidebar-section">
-            <h3 className="sidebar-title">{sidebar.quickLinksTitle}</h3>
+            <h3 className="sidebar-title">Quick Links</h3>
             <ul className="quick-links-list">
-              {sidebar.quickLinks.map((link) => (
-                <li key={link.href}><a href={link.href}>{link.label}</a></li>
-              ))}
+              <li><a href="#help">Help & Support</a></li>
+              <li><a href="#faq">FAQs</a></li>
+              <li><a href="#notes">My Notes</a></li>
+              <li><a href="#bookmarks">Bookmarked Sessions</a></li>
             </ul>
           </div>
         </div>

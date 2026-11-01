@@ -1,8 +1,12 @@
 import PageComponent from '@/src/views/AviationCareers';
-import { resolvePageMetadata } from '@/lib/siteContent';
+import { toNextMetadata } from '@/lib/pageMetaStore';
 
-export const metadata = resolvePageMetadata('aviationCareers');
+export const dynamic = 'force-dynamic';
 
-export default function Page() {
+export async function generateMetadata() {
+  return toNextMetadata('aviationCareers');
+}
+
+export default function AviationCareersPage() {
   return <PageComponent />;
 }

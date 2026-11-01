@@ -1,8 +1,12 @@
 import PageComponent from '@/src/views/KiteItDepartment';
-import { resolvePageMetadata } from '@/lib/siteContent';
+import { toNextMetadata } from '@/lib/pageMetaStore';
 
-export const metadata = resolvePageMetadata('itDepartment');
+export const dynamic = 'force-dynamic';
 
-export default function Page() {
+export async function generateMetadata() {
+  return toNextMetadata('itDepartment');
+}
+
+export default function KiteItDepartmentPage() {
   return <PageComponent />;
 }

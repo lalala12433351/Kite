@@ -1,8 +1,12 @@
 import PageComponent from '@/src/views/Sitemap';
-import { resolvePageMetadata } from '@/lib/siteContent';
+import { toNextMetadata } from '@/lib/pageMetaStore';
 
-export const metadata = resolvePageMetadata('sitemap');
+export const dynamic = 'force-dynamic';
 
-export default function Page() {
+export async function generateMetadata() {
+  return toNextMetadata('sitemap');
+}
+
+export default function SitemapPagePage() {
   return <PageComponent />;
 }

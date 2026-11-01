@@ -1,8 +1,12 @@
 import PageComponent from '@/src/views/Placement';
-import { resolvePageMetadata } from '@/lib/siteContent';
+import { toNextMetadata } from '@/lib/pageMetaStore';
 
-export const metadata = resolvePageMetadata('placement');
+export const dynamic = 'force-dynamic';
 
-export default function Page() {
+export async function generateMetadata() {
+  return toNextMetadata('placement');
+}
+
+export default function PlacementPage() {
   return <PageComponent />;
 }

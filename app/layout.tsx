@@ -2,34 +2,33 @@ import './globals.css';
 import { Suspense } from 'react';
 import GoogleTagManager from '@/src/components/GoogleTagManager';
 import ScrollToTop from '@/src/components/ScrollToTop';
-import { pageMeta } from '@/lib/pageMeta';
-import { getSeoDocument } from '@/lib/siteContent';
+import { getPageMeta } from '@/lib/pageMetaStore';
 
-const seoDefaults = getSeoDocument().defaults || {};
-const fallbackKeywords = [
-  'Aviation Institute',
-  'Hospitality Training',
-  'Cabin Crew Course',
-  'Airport Management',
-  'Aviation Courses',
-  'Bengaluru',
-];
-const keywordsFromCms =
-  typeof seoDefaults.keywords === 'string' && seoDefaults.keywords.trim()
-    ? seoDefaults.keywords.split(',').map((k) => k.trim()).filter(Boolean)
-    : null;
+export const dynamic = 'force-dynamic';
 
-export const metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://kiteaviation.in'),
-  title: {
-    default: seoDefaults.title || pageMeta.home.title,
-    template: '%s | Kite Institute',
-  },
-  description: seoDefaults.description || pageMeta.home.description,
-  keywords: keywordsFromCms || fallbackKeywords,
-  robots: { index: true, follow: true },
-  icons: { icon: '/favicon.png' },
-};
+export async function generateMetadata() {
+  const home = getPageMeta('home');
+  return {
+    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://kiteaviation.in'),
+    title: {
+      default: home.title,
+      template: '%s | Kite Institute',
+    },
+    description: home.description,
+    keywords: home.keywords
+      ? home.keywords.split(',').map((k) => k.trim()).filter(Boolean)
+      : [
+          'Aviation Institute',
+          'Hospitality Training',
+          'Cabin Crew Course',
+          'Airport Management',
+          'Aviation Courses',
+          'Bengaluru',
+        ],
+    robots: { index: true, follow: true },
+    icons: { icon: '/favicon.png' },
+  };
+}
 
 export const viewport = {
   themeColor: '#0a377f',

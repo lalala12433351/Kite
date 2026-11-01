@@ -1,8 +1,12 @@
 import PageComponent from '@/src/views/CourseDetail';
-import { resolvePageMetadata } from '@/lib/siteContent';
+import { toNextMetadata } from '@/lib/pageMetaStore';
 
-export const metadata = resolvePageMetadata('course');
+export const dynamic = 'force-dynamic';
 
-export default function Page() {
+export async function generateMetadata() {
+  return toNextMetadata('course');
+}
+
+export default function CourseDetailPage() {
   return <PageComponent />;
 }

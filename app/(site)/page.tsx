@@ -1,8 +1,11 @@
 import PageComponent from '@/src/views/Home';
-import { resolvePageMetadata } from '@/lib/siteContent';
+import { toNextMetadata } from '@/lib/pageMetaStore';
 
-const homeMeta = resolvePageMetadata('home');
-export const metadata = { ...homeMeta, title: { absolute: homeMeta.title } };
+export const dynamic = 'force-dynamic';
+
+export async function generateMetadata() {
+  return toNextMetadata('home', { absoluteTitle: true });
+}
 
 export default function HomePage() {
   return <PageComponent />;

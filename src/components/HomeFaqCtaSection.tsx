@@ -2,9 +2,7 @@
 
 import { useState } from 'react';
 import { Link } from '@/lib/router';
-import { useCmsContent } from '@/src/hooks/useCmsContent';
-import homeFallback from '../../data/home.json';
-import homeFaqItemsFallback from '../data/homeFaqItems';
+import homeFaqItems from '../data/homeFaqItems';
 
 function openCareerGuidanceForm() {
   window.dispatchEvent(
@@ -16,9 +14,6 @@ function openCareerGuidanceForm() {
 
 function HomeFaqCtaSection() {
   const [openFaqId, setOpenFaqId] = useState(null);
-  const { data: home } = useCmsContent('home', homeFallback);
-  const faqItems =
-    home?.faqItems?.length ? home.faqItems : homeFaqItemsFallback;
 
   const toggleFaq = (id) => {
     setOpenFaqId((current) => (current === id ? null : id));
@@ -30,7 +25,7 @@ function HomeFaqCtaSection() {
         <div className="home-faq-cta__faq">
           <h3 className="home-faq-cta__faq-title">Frequently Asked Questions</h3>
           <ul className="home-faq-cta__list">
-            {faqItems.map((item) => {
+            {homeFaqItems.map((item) => {
               const isOpen = openFaqId === item.id;
               return (
                 <li key={item.id} className={`home-faq-cta__item${isOpen ? ' is-open' : ''}`}>

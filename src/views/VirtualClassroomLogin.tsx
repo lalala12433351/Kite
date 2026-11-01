@@ -2,13 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from '@/lib/router';
-import { useCmsContent } from '@/src/hooks/useCmsContent';
-import virtualClassroomFallback from '../../data/virtual-classroom.json';
+
+// Get base URL for assets
+const getAssetUrl = (path) => `${'/'}${path}`;
 
 function VirtualClassroomLogin() {
   const navigate = useNavigate();
-  const { data: vcDoc } = useCmsContent('virtual-classroom', virtualClassroomFallback);
-  const login = vcDoc?.login || virtualClassroomFallback.login;
   const [studentId, setStudentId] = useState('');
   const [password, setPassword] = useState('');
   const [selectedIcon, setSelectedIcon] = useState(null);
@@ -155,17 +154,18 @@ function VirtualClassroomLogin() {
 
     // Validate inputs
     if (!studentId || !password) {
-      setError(login.errors.missingFields);
+      setError('Please fill in Student ID and Password');
       return;
     }
 
+    // Validate captcha
     if (!selectedIcon) {
-      setError(login.errors.captchaRequired);
+      setError('Please select an icon to verify you are human');
       return;
     }
 
     if (selectedIcon !== captchaCorrectId) {
-      setError(login.errors.captchaIncorrect);
+      setError('Incorrect icon selected. Please try again.');
       generateCaptcha();
       setSelectedIcon(null);
       return;
@@ -185,31 +185,31 @@ function VirtualClassroomLogin() {
     <div className="content-box virtual-classroom-login inside-page">
       <div className="virtual-classroom-login-container">
         <div className="virtual-classroom-login-header">
-          <h2>{login.heading}</h2>
-          <p>{login.subtitle}</p>
+          <h2>Virtual Classroom</h2>
+          <p>This is a preview of recorded lessons. Any student ID opens the sample classroom.</p>
         </div>
 
         <form onSubmit={handleSubmit}>
           <label className="virtual-classroom-form-label">
-            {login.studentIdLabel}
+            Student ID
           </label>
           <input
             type="text"
             value={studentId}
             onChange={(e) => setStudentId(e.target.value)}
-            placeholder={login.studentIdPlaceholder}
+            placeholder="Enter your Student ID"
             className="virtual-classroom-form-input"
             required
           />
 
           <label className="virtual-classroom-form-label margin-top">
-            {login.passwordLabel}
+            Password
           </label>
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder={login.passwordPlaceholder}
+            placeholder="Enter your password"
             className="virtual-classroom-form-input"
             required
           />
@@ -234,14 +234,14 @@ function VirtualClassroomLogin() {
             onClick={generateCaptcha}
             className="virtual-classroom-generate-btn"
           >
-            {login.generateCaptchaLabel}
+            Generate New Icons
           </button>
 
           <button 
             type="submit" 
             className="virtual-classroom-submit-btn"
           >
-            {login.submitLabel}
+            Enter Virtual Classroom
           </button>
 
           {error && (
@@ -253,7 +253,7 @@ function VirtualClassroomLogin() {
 
         <div className="virtual-classroom-note">
           <p>
-            <strong>Note:</strong> {login.note.replace(/\n/g, ' ')}
+            <strong>Note:</strong> This is a secure login system.<br/> Your credentials are encrypted and protected.
           </p>
         </div>
       </div>

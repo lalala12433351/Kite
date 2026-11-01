@@ -1,17 +1,11 @@
 'use client';
 
 import { Link } from '@/lib/router';
-import { useCmsContent, cmsAssetUrl } from '@/src/hooks/useCmsContent';
-import { courses as fallbackCourses } from '../data/coursesData';
-import coursesDocFallback from '../../data/courses.json';
+import { courses } from '../data/coursesData';
+
+const getAssetUrl = (path) => `${'/'}${path}`;
 
 function CourseSection() {
-  const cmsFallback = coursesDocFallback?.courses?.length
-    ? coursesDocFallback
-    : { courses: fallbackCourses };
-  const { data: coursesDoc } = useCmsContent('courses', cmsFallback);
-  const courses = coursesDoc?.courses?.length ? coursesDoc.courses : fallbackCourses;
-
   const handleEnrollClick = (e) => {
     e.preventDefault();
     const event = new CustomEvent('openEnquiryForm', { detail: { title: 'Course Enrollment' } });
@@ -37,7 +31,7 @@ function CourseSection() {
       <div className="list-of-courses">
         {courses.map((course) => (
           <div key={course.id} className="item">
-            <img src={cmsAssetUrl(course.image)} className="course-thumb" loading="lazy" alt="" />
+            <img src={getAssetUrl(course.image)} className="course-thumb" loading="lazy" alt="" />
 
             <Link to={`/courses/${course.id}`} className="know-more">
               <h3>

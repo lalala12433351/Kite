@@ -1,8 +1,12 @@
 import PageComponent from '@/src/views/News';
-import { resolvePageMetadata } from '@/lib/siteContent';
+import { toNextMetadata } from '@/lib/pageMetaStore';
 
-export const metadata = resolvePageMetadata('news');
+export const dynamic = 'force-dynamic';
 
-export default function Page() {
+export async function generateMetadata() {
+  return toNextMetadata('news');
+}
+
+export default function NewsPage() {
   return <PageComponent />;
 }

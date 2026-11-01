@@ -1,8 +1,12 @@
 import PageComponent from '@/src/views/VirtualClassroomLogin';
-import { resolvePageMetadata } from '@/lib/siteContent';
+import { toNextMetadata } from '@/lib/pageMetaStore';
 
-export const metadata = resolvePageMetadata('virtualClassroomLogin');
+export const dynamic = 'force-dynamic';
 
-export default function Page() {
+export async function generateMetadata() {
+  return toNextMetadata('virtualClassroomLogin');
+}
+
+export default function VirtualClassroomLoginPage() {
   return <PageComponent />;
 }

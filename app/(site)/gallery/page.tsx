@@ -1,8 +1,12 @@
 import PageComponent from '@/src/views/Gallery';
-import { resolvePageMetadata } from '@/lib/siteContent';
+import { toNextMetadata } from '@/lib/pageMetaStore';
 
-export const metadata = resolvePageMetadata('gallery');
+export const dynamic = 'force-dynamic';
 
-export default function Page() {
+export async function generateMetadata() {
+  return toNextMetadata('gallery');
+}
+
+export default function GalleryPage() {
   return <PageComponent />;
 }
