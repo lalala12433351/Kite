@@ -81,17 +81,21 @@ function NewsDetail() {
 
   if (loading) {
     return (
-      <div className="content blog-article blog-detail">
-        <p>Loading…</p>
+      <div className="content blog-article">
+        <div className="blog-detail">
+          <p>Loading…</p>
+        </div>
       </div>
     );
   }
 
   if (error || !post) {
     return (
-      <div className="content blog-article blog-detail">
-        <p>{error || 'Post not found'}</p>
-        <Link to="/news">← Back to news</Link>
+      <div className="content blog-article">
+        <div className="blog-detail">
+          <p>{error || 'Post not found'}</p>
+          <Link to="/news">← Back to news</Link>
+        </div>
       </div>
     );
   }
@@ -99,7 +103,8 @@ function NewsDetail() {
   const approved = (post.comments || []).filter((c) => c.isApproved);
 
   return (
-    <div className="content blog-article blog-detail">
+    <div className="content blog-article">
+      <div className="blog-detail">
       <Link to="/news" className="blog-detail__back">
         ← All news
       </Link>
@@ -155,6 +160,7 @@ function NewsDetail() {
           {commentMsg ? <p className="blog-detail__msg">{commentMsg}</p> : null}
         </form>
       </section>
+      </div>
     </div>
   );
 }

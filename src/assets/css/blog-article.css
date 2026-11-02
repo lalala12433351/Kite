@@ -1,0 +1,10 @@
+.content.blog-article {
+  float: none;
+  clear: both;
+  width: 100%;
+  max-width: none;
+  background: #ffffff;
+  color: #0b1f3a;
+  box-sizing: border-box;
+  padding: 32px 24px 72px;
+}
