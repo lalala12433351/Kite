@@ -83,6 +83,12 @@ function AviationCareers() {
       result.sort((a, b) => a.title.localeCompare(b.title));
     }
 
+    const firstIndex = result.findIndex((post) => post.isFirst);
+    if (firstIndex > 0) {
+      const [firstPost] = result.splice(firstIndex, 1);
+      result.unshift(firstPost);
+    }
+
     setFilteredPosts(result);
     setPage(1); // Reset to first page on filter change
   }, [posts, activeTag, searchQuery, sortType]);
@@ -226,6 +232,7 @@ function AviationCareers() {
                               </a>
                             </div>
                             <div className="meta">
+                              {post.isFirst ? 'First post • ' : ''}
                               {formatDate(post.date)} • {post.author}
                             </div>
                             <div className="excerpt">{post.excerpt}</div>

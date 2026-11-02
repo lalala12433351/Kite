@@ -38,10 +38,13 @@ function AviationCareersAdmin({ embedded = false, onLogout }) {
     author: '',
     thumb: '',
     tags: '',
-    link: ''
+    link: '',
+    isFirst: false
   });
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState(''); // 'success' or 'error'
+  const [uploading, setUploading] = useState(false);
+  const [cardUploadingId, setCardUploadingId] = useState(null);
 
   // Load existing posts
   useEffect(() => {
@@ -88,6 +91,126 @@ function AviationCareersAdmin({ embedded = false, onLogout }) {
     }));
   };
 
+  const uploadCareerImage = async (file) => {
+    const body = new FormData();
+    body.append('file', file);
+    const response = await fetch('/api/careers/upload', {
+      method: 'POST',
+      credentials: 'same-origin',
+      body,
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok || !data.success || !data.url) {
+      throw new Error(data.error || 'Image upload failed');
+    }
+    return data.url;
+  };
+
+  const handleThumbFile = async (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+    setUploading(true);
+    setMessage('');
+    try {
+      const url = await uploadCareerImage(file);
+      setFormData((prev) => ({ ...prev, thumb: url }));
+      setMessage('Image uploaded. Save the post to keep it on this job.');
+      setMessageType('success');
+    } catch (error) {
+      setMessage(error.message || 'Image upload failed');
+      setMessageType('error');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleCardImage = async (event, post) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+    setCardUploadingId(post.id);
+    setMessage('');
+    try {
+      const url = await uploadCareerImage(file);
+      const postData = {
+        title: post.title,
+        excerpt: post.excerpt,
+        content: post.content,
+        author: post.author,
+        thumb: url,
+      tags: post.tags,
+      link: post.link || '',
+      isFirst: Boolean(post.isFirst),
+    };
+      const formBody = new URLSearchParams();
+      formBody.append('action', 'update');
+      formBody.append('postData', JSON.stringify(postData));
+      formBody.append('postId', String(post.id));
+      const response = await fetch('/aviation-careers-admin.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        credentials: 'same-origin',
+        body: formBody.toString(),
+      });
+      const result = await response.json();
+      if (result.status !== 'success') {
+        throw new Error(result.message || 'Failed to save image');
+      }
+      setPosts((prev) => prev.map((item) => (item.id === post.id ? { ...item, thumb: url } : item)));
+      if (editingId === post.id) {
+        setFormData((prev) => ({ ...prev, thumb: url }));
+      }
+      setMessage('Image saved.');
+      setMessageType('success');
+      setTimeout(() => setMessage(''), 3000);
+    } catch (error) {
+      setMessage('Error: ' + (error.message || 'Could not save image'));
+      setMessageType('error');
+    } finally {
+      setCardUploadingId(null);
+    }
+  };
+
+  const setAsFirst = async (post) => {
+    if (post.isFirst) return;
+    setMessage('');
+    try {
+      const postData = {
+        title: post.title,
+        excerpt: post.excerpt,
+        content: post.content,
+        author: post.author,
+        thumb: post.thumb || '',
+        tags: post.tags,
+        link: post.link || '',
+        isFirst: true,
+      };
+      const formBody = new URLSearchParams();
+      formBody.append('action', 'update');
+      formBody.append('postData', JSON.stringify(postData));
+      formBody.append('postId', String(post.id));
+      const response = await fetch('/aviation-careers-admin.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        credentials: 'same-origin',
+        body: formBody.toString(),
+      });
+      const result = await response.json();
+      if (result.status !== 'success') {
+        throw new Error(result.message || 'Failed to set the first post');
+      }
+      setPosts((prev) => prev.map((item) => ({ ...item, isFirst: item.id === post.id })));
+      setFormData((prev) => ({ ...prev, isFirst: editingId === post.id }));
+      setMessage(`${post.title} is now the first post.`);
+      setMessageType('success');
+      setTimeout(() => setMessage(''), 3000);
+    } catch (error) {
+      setMessage('Error: ' + (error.message || 'Could not set the first post'));
+      setMessageType('error');
+    }
+  };
+
   // Auto-resize textarea
   const excerptTextareaRef = useAutoResizeTextarea(formData.excerpt);
 
@@ -111,7 +234,8 @@ function AviationCareersAdmin({ embedded = false, onLogout }) {
       author: formData.author,
       thumb: formData.thumb,
       tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
-      link: formData.link
+      link: formData.link,
+      isFirst: Boolean(formData.isFirst)
     };
 
     try {
@@ -143,12 +267,14 @@ function AviationCareersAdmin({ embedded = false, onLogout }) {
       // Fallback for development: Update local state
       if (error.message === 'Failed to fetch') {
         if (isEditing) {
-          // Update existing post
-          const updatedPosts = posts.map(p => 
+          let updatedPosts = posts.map(p => 
             p.id === editingId 
               ? { ...p, ...postData, tags: postData.tags }
               : p
           );
+          if (postData.isFirst) {
+            updatedPosts = updatedPosts.map((item) => ({ ...item, isFirst: item.id === editingId }));
+          }
           setPosts(updatedPosts);
           setMessage('⚠️ DEV MODE: Post updated locally (Backend not connected)');
         } else {
@@ -159,7 +285,8 @@ function AviationCareersAdmin({ embedded = false, onLogout }) {
             views: 0,
             ...postData
           };
-          setPosts([...posts, newPost]);
+          const nextPosts = [...posts, newPost];
+          setPosts(postData.isFirst ? nextPosts.map((item) => ({ ...item, isFirst: item.id === newPost.id })) : nextPosts);
           setMessage('⚠️ DEV MODE: Post added locally (Backend not connected)');
         }
         setMessageType('success');
@@ -183,7 +310,8 @@ function AviationCareersAdmin({ embedded = false, onLogout }) {
       author: post.author,
       thumb: post.thumb,
       tags: post.tags.join(', '),
-      link: post.link || ''
+      link: post.link || '',
+      isFirst: Boolean(post.isFirst)
     });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -239,7 +367,8 @@ function AviationCareersAdmin({ embedded = false, onLogout }) {
       author: '',
       thumb: '',
       tags: '',
-      link: ''
+      link: '',
+      isFirst: false
     });
   };
 
@@ -337,14 +466,40 @@ function AviationCareersAdmin({ embedded = false, onLogout }) {
             required
           />
 
-          <label className="admin-label admin-label--float">Thumbnail URL</label>
+          <label className="admin-label admin-label--float">Job image</label>
+          {formData.thumb ? (
+            <div className="admin-image-preview">
+              <img src={formData.thumb} alt="" />
+            </div>
+          ) : null}
+          <div className="admin-form-buttons">
+            <label className="admin-btn--edit">
+              {uploading ? 'Uploading…' : formData.thumb ? 'Change image' : 'Upload image'}
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                onChange={handleThumbFile}
+                hidden
+                disabled={uploading}
+              />
+            </label>
+            {formData.thumb ? (
+              <button
+                type="button"
+                className="admin-btn--cancel"
+                onClick={() => setFormData((prev) => ({ ...prev, thumb: '' }))}
+              >
+                Remove image
+              </button>
+            ) : null}
+          </div>
           <input
             type="text"
             name="thumb"
             value={formData.thumb}
             onChange={handleChange}
             className="admin-input"
-            placeholder="https://images.unsplash.com/... or leave empty"
+            placeholder="Or paste an image URL"
           />
 
           <label className="admin-label admin-label--float">Tags (comma separated)</label>
@@ -367,6 +522,15 @@ function AviationCareersAdmin({ embedded = false, onLogout }) {
             className="admin-input"
             placeholder="https://airline.com/careers (optional)"
           />
+
+          <label className="admin-label">
+            <input
+              type="checkbox"
+              checked={Boolean(formData.isFirst)}
+              onChange={(event) => setFormData((prev) => ({ ...prev, isFirst: event.target.checked }))}
+            />
+            {' '}Show this as the first post
+          </label>
 
           <div className="admin-form-buttons">
             <button type="submit" className="admin-btn--save">
@@ -413,6 +577,8 @@ function AviationCareersAdmin({ embedded = false, onLogout }) {
             <li>Include airline name in the title</li>
             <li>Specify location, salary range, and requirements</li>
             <li>Use the editor toolbar to format content</li>
+            <li>Upload a job image, or paste an image URL</li>
+            <li>Choose one post to show first on the aviation careers page</li>
             <li>Add relevant tags: cabincrew, groundstaff, cargo, etc.</li>
             <li>Posts are saved directly to the JSON file</li>
           </ul>
@@ -426,15 +592,23 @@ function AviationCareersAdmin({ embedded = false, onLogout }) {
             <p className="admin-posts-empty">No aviation jobs posted yet. Add your first job!</p>
           ) : (
             <div className="admin-posts-list">
-              {posts.map((post) => (
+              {[...posts]
+                .sort((a, b) => Number(Boolean(b.isFirst)) - Number(Boolean(a.isFirst)))
+                .map((post) => (
                 <div 
                   key={post.id} 
                   className={`admin-post-card ${editingId === post.id ? 'admin-post-card--editing' : ''}`}
                 >
+                  {post.thumb ? (
+                    <div className="admin-image-preview" style={{ maxHeight: 140, marginBottom: 12 }}>
+                      <img src={post.thumb} alt="" style={{ maxHeight: 140, objectFit: 'cover' }} />
+                    </div>
+                  ) : null}
                   <h3 className="large">{post.title}</h3>
                   <p className="subtitle">{post.excerpt}</p>
                   
                   <div className="admin-post-meta">
+                    {post.isFirst ? <small>First post</small> : null}
                     <small>By {post.author}</small>
                     <small>• {post.date}</small>
                     <small>• {post.views || 0} views</small>
@@ -449,6 +623,24 @@ function AviationCareersAdmin({ embedded = false, onLogout }) {
                   </div>
 
                   <div className="admin-post-actions">
+                    <button
+                      type="button"
+                      className="admin-btn--edit"
+                      onClick={() => setAsFirst(post)}
+                      disabled={Boolean(post.isFirst)}
+                    >
+                      {post.isFirst ? 'First post' : 'Set as first'}
+                    </button>
+                    <label className="admin-btn--edit">
+                      {cardUploadingId === post.id ? 'Uploading…' : post.thumb ? 'Change image' : 'Add image'}
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp,image/gif"
+                        onChange={(event) => handleCardImage(event, post)}
+                        hidden
+                        disabled={cardUploadingId === post.id}
+                      />
+                    </label>
                     <button onClick={() => handleEdit(post)} className="admin-btn--edit">
                       Edit
                     </button>

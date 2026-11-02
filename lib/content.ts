@@ -62,6 +62,17 @@ export function writeContent(kind, data) {
   return payload;
 }
 
+function keepSingleFirstPost(posts, selected, kind) {
+  if (kind !== 'careers' && kind !== 'aviation-careers') return;
+  if (!selected?.isFirst) {
+    if (selected) selected.isFirst = false;
+    return;
+  }
+  for (const post of posts) {
+    post.isFirst = Number(post.id) === Number(selected.id);
+  }
+}
+
 function formatDisplayDate(iso) {
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return String(iso || '');
@@ -92,6 +103,7 @@ export async function handlePostAction(kind, request) {
         throw new Error('Title and content are required');
       }
       posts.push(next);
+      keepSingleFirstPost(posts, next, kind);
       writeContent(kind, posts);
       return { status: 'success', message: 'Saved', post: next };
     }
@@ -106,6 +118,7 @@ export async function handlePostAction(kind, request) {
       id: posts[index].id,
       formatted_date: kind === 'news' ? (postData.formatted_date || formatDisplayDate(createdAt)) : posts[index].formatted_date,
     };
+    keepSingleFirstPost(posts, posts[index], kind);
     writeContent(kind, posts);
     return { status: 'success', message: 'Updated' };
   }
