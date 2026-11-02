@@ -1,8 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 import DOMPurify from 'isomorphic-dompurify';
+import { dataDir } from '@/lib/persistentStore';
 
-export const dataDir = path.join(process.cwd(), 'data');
+export { dataDir };
 
 const FILES = {
   news: 'news-posts.json',

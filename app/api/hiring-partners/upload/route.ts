@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { uploadFolder } from '@/lib/persistentStore';
 import { requireAdmin } from '@/lib/session';
 
 export const runtime = 'nodejs';
@@ -25,8 +26,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const dir = path.join(process.cwd(), 'public', 'uploads', 'partners');
-    fs.mkdirSync(dir, { recursive: true });
+    const dir = uploadFolder('partners');
     const filename = `partner-${Date.now()}${ext}`;
     const buffer = Buffer.from(await upload.arrayBuffer());
     fs.writeFileSync(path.join(dir, filename), buffer);

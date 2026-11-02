@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { uploadFolder } from '@/lib/persistentStore';
 import { requireAdmin } from '@/lib/session';
 
 export const runtime = 'nodejs';
@@ -22,8 +23,7 @@ export async function POST(request: Request) {
       return Response.json({ success: false, error: 'Upload a JPG, PNG, WEBP, or GIF image' }, { status: 400 });
     }
 
-    const dir = path.join(process.cwd(), 'public', 'uploads', 'careers');
-    fs.mkdirSync(dir, { recursive: true });
+    const dir = uploadFolder('careers');
     const filename = `career-${Date.now()}${ext}`;
     const buffer = Buffer.from(await upload.arrayBuffer());
     fs.writeFileSync(path.join(dir, filename), buffer);

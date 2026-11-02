@@ -5,16 +5,17 @@
 import fs from 'fs';
 import path from 'path';
 import formidable from 'formidable';
+import { dataDir, galleryFilesDir } from '@/lib/persistentStore';
 
 const ROOT = process.cwd();
 const PUBLIC = path.join(ROOT, 'public');
 const PUBLIC_ALBUM = path.join(PUBLIC, 'album');
-const DATABASE_DIR = path.join(ROOT, 'data');
+const DATABASE_DIR = dataDir;
 const ALBUMS_DIR = path.join(DATABASE_DIR, 'albums');
 const JSON_PATH = path.join(DATABASE_DIR, 'gallery-images.json');
 const ALBUMS_PATH = path.join(DATABASE_DIR, 'gallery-albums.json');
 const SETTINGS_PATH = path.join(DATABASE_DIR, 'gallery-settings.json');
-const GALLERY_DIR = path.join(PUBLIC, 'images', 'gallery');
+const GALLERY_DIR = galleryFilesDir;
 
 const DEFAULT_GALLERY_DESCRIPTION =
   'Every picture tells a story — of passion, progress, and possibilities. Browse through our gallery to relive the inspiring moments, cultural celebrations, and proud achievements that make Kite Institute a truly dynamic place to learn and grow.';

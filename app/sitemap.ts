@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { dataDir } from '@/lib/persistentStore';
 import { courses } from '@/src/data/coursesData';
 
 const BASE = process.env.NEXT_PUBLIC_SITE_URL || 'https://kiteaviation.in';
@@ -38,7 +39,7 @@ export default function sitemap() {
   ];
 
   try {
-    const file = path.join(process.cwd(), 'data', 'news-posts.json');
+    const file = path.join(dataDir, 'news-posts.json');
     const posts = JSON.parse(fs.readFileSync(file, 'utf8'));
     for (const post of posts) {
       if (!post?.slug) continue;
@@ -55,7 +56,7 @@ export default function sitemap() {
   }
 
   try {
-    const file = path.join(process.cwd(), 'data', 'blogs.json');
+    const file = path.join(dataDir, 'blogs.json');
     const posts = JSON.parse(fs.readFileSync(file, 'utf8'));
     for (const post of posts) {
       if (!post?.slug) continue;
