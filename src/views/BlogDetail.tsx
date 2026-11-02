@@ -80,7 +80,7 @@ function BlogDetail() {
 
   if (loading) {
     return (
-      <div className="content-panel blog-detail">
+      <div className="content blog-article blog-detail">
         <p>Loading…</p>
       </div>
     );
@@ -88,7 +88,7 @@ function BlogDetail() {
 
   if (error || !post) {
     return (
-      <div className="content-panel blog-detail">
+      <div className="content blog-article blog-detail">
         <p>{error || 'Post not found'}</p>
         <Link to="/blog">← Back to blog</Link>
       </div>
@@ -98,7 +98,7 @@ function BlogDetail() {
   const approved = (post.comments || []).filter((c) => c.isApproved);
 
   return (
-    <div className="content-panel blog-detail">
+    <div className="content blog-article blog-detail">
       <Link to="/blog" className="blog-detail__back">
         ← All articles
       </Link>

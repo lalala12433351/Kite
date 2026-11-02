@@ -279,18 +279,23 @@ function BlogsAdmin({
     if (!editing) return;
     let nextBlocks = editing.blocks;
     if (classicMode) nextBlocks = classicToBlocks(classicText);
+    // Drafts and archived posts go live. Scheduled posts keep their date.
+    const status: BlogStatus =
+      editing.status === 'scheduled' || editing.status === 'published' ? editing.status : 'published';
     const next = posts.map((p) =>
       p.id === editing.id
         ? {
-            ...p,
+            ...editing,
             blocks: nextBlocks,
-            status: (p.status === 'archived' ? 'draft' : p.status) as BlogStatus,
-            isPublished: p.status === 'published' || p.status === 'scheduled',
-            slug: slugify(p.slug || p.title),
+            status,
+            isPublished: status === 'published',
+            slug: slugify(editing.slug || editing.title),
           }
         : p,
     );
-    persist(next, 'Post updated');
+    const message =
+      status === 'scheduled' ? 'Post scheduled' : editing.status === 'published' ? 'Post updated' : 'Post published';
+    persist(next, message);
   };
 
   const setStatus = (status: BlogStatus) => {
@@ -346,7 +351,9 @@ function BlogsAdmin({
                 ? 'Saving…'
                 : editing.status === 'published'
                   ? 'Update'
-                  : 'Publish'}
+                  : editing.status === 'scheduled'
+                    ? 'Schedule'
+                    : 'Publish'}
             </button>
           </div>
         </div>
