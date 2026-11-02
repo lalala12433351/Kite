@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import PageComponent from '@/src/views/BlogDetail';
-import { getBlogBySlug, isPostPublic } from '@/lib/blogs';
+import { getBlogBySlug, getPublicBlogs, isPostPublic } from '@/lib/blogs';
 import {
   buildBlogPostingJsonLd,
   getOgDescription,
@@ -71,8 +71,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function BlogDetailPage({ params }: PageProps) {
   const resolved = await params;
   const post = getBlogBySlug(resolved.slug);
-  const jsonLd =
-    post && isPostPublic(post) ? buildBlogPostingJsonLd(post, siteUrl()) : null;
+  const published = post && isPostPublic(post) ? post : null;
+  const jsonLd = published ? buildBlogPostingJsonLd(published, siteUrl()) : null;
+  const related = published
+    ? getPublicBlogs().filter((item) => item.slug !== published.slug)
+    : [];
 
   return (
     <>
@@ -82,7 +85,11 @@ export default async function BlogDetailPage({ params }: PageProps) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       ) : null}
-      <PageComponent />
+      <PageComponent
+        initialPost={published}
+        related={related}
+        canonicalUrl={published ? published.canonicalUrl || `${siteUrl()}/blog/${published.slug}` : ''}
+      />
     </>
   );
 }

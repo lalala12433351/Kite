@@ -1,0 +1,14 @@
+---
+description: Blogs are the SEO articles and use the news article layout
+alwaysApply: true
+---
+
+# Blogs are for SEO
+
+Blog posts are the site’s search articles. News is a separate section.
+
+- Public blog URLs stay `/blog` and `/blog/[slug]`.
+- A blog article uses the same visual layout as the Kite news article (`content-box news-detail`): title, excerpt, date, category, cover, body, share row, and an “explore more stories” sidebar of other blog posts.
+- Keep one `h1` (the post title). Section headings in the body start at `h2`.
+- Keep the server metadata, canonical URL, Open Graph tags, and BlogPosting JSON-LD. Do not replace those with a client-only title.
+- Write excerpts, meta title, and meta description for search. Do not treat the blog as a copy of the news feed.
